@@ -10,8 +10,7 @@ import java.util.logging.Filter;
 
 public class Application {
 
-    private.
-    class FilterVersion implements FilenameFilter{
+    private class FilterVersion implements FilenameFilter{
         @Override
         public boolean accept(File dir, String name) {
             return !name.matches("\\..*");
