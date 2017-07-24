@@ -45,7 +45,7 @@ public class Application {
         return APPLICATIONS;
     }
 
-    public List<String> getVersions() {
+    private List<String> getVersions() {
         File buildsDir = Files.getBuildsDir();
         String appPathName = buildsDir.getAbsolutePath() +  File.separatorChar + fileSystemName;
         File appFile = new File(appPathName);
@@ -53,7 +53,7 @@ public class Application {
         return Arrays.asList(appFile.list(new FilterFilesStartWNumber()));
     }
 
-    public List<String> getReleases(String versionName) {
+    private List<String> getReleases(String versionName) {
         String versionPath = Files.getBuildsDir().getAbsolutePath();
         if (APP_VERSIONS_SEPARATOR == null) {
             versionPath += File.separatorChar + fileSystemName + File.separatorChar + versionName;
@@ -74,6 +74,30 @@ public class Application {
 
         return Arrays.asList(releasesDirectory.list(new FilterFilesStartWNumber()));
     }
+
+    public static List<String> getReleases(String appName, String versionName) {
+        if (appName.equals("NO APP") || versionName.equals("NO VERSION")) {
+            return new ArrayList<>();
+        }
+        for (Application app: APPLICATIONS) {
+            if (app.getFileSystemName().equals(appName)) {
+                return app.getReleases(versionName);
+            }
+        }
+        throw new RuntimeException("Application: " + appName + " with version: " + versionName + " does not exist.");
+    }
+    public static List<String> getVersions(String fileSystemName) {
+        if (fileSystemName.equals("NO APP")) {
+            return new ArrayList<String>();
+        }
+        for (Application app: APPLICATIONS) {
+            if (app.getFileSystemName().equals(fileSystemName)) {
+                return app.getVersions();
+            }
+        }
+        throw new RuntimeException("Application Name: " + fileSystemName + " does not exist.");
+    }
+
 
     @Override
     public String toString() {

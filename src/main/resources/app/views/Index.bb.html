@@ -6,10 +6,49 @@
 <form>
     <div class="form-group">
         <label class="control-label">Select Application</label>
-        <select class="form-control" name="make" ic-post-to="/apps" ic-target="#models" ic-indicator="#model-ind">
+        <select class="form-control" name="app" ic-post-to="/apps" ic-target="#versions" ic-indicator="#version-ind">
+            <option value="NO APP">Select an Option</option>
             <% for(Application app : Application.getAll()) { %>
             <option value="${app.getFileSystemName()}">${app.getName()}</option>
             <% } %>
         </select>
+        <% String app = "NO APP";
+           String version = "NO VERSION"; %>
+        <div class="form-group">
+            <label class="control-label">Major Version <i id="version-ind" class="fa fa-spinner fa-spin" style="display: none"></i></label>
+            <div id="MajorVersions"
+                 ic-src="/apps">
+            <%@ section MajorVersions(String app) %>
+                <select id="versions"
+                        class="form-control"
+                        name="version"
+                        ic-post-to="/releases"
+                        ic-target="#releases"
+                        ic-indicator="#release-ind"
+                        <% if (app.equals("NO APP")) { %> disabled="disabled" <% } %>
+                >
+                <option value="NO VERSION"></option>
+                <% for(String version: Application.getVersions(app)) { %>
+                        <option value="${version}">${version}</option>
+                    <% } %>
+                </select>
+            <%@ end section %>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label">Release <i id="release-ind" class="fa fa-spinner fa-spin" style="display: none"></i></label>
+            <div id="VersionReleases"
+                 ic-src="/releases">
+                <%@ section Releases(String app, String version) %>
+                <select id="releases" class="form-control" name="release" <% if (version.equals("NO VERSION")) { %> disabled="disabled" <% } %> >
+                    <option value="NO RELEASE"></option>
+                <% for(String release: Application.getReleases(app, version)) { %>
+                    <option value="${release}">${release}</option>
+                <% } %>
+                </select>
+                <%@ end section %>
+            </div>
+        </div>
     </div>
 </form>
