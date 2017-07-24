@@ -1,4 +1,5 @@
 <%@ layout Layout %>
+<%@ import app.model.* %>
 
 <h3>What Version of Gosu Am I Using?</h3>
 
@@ -6,9 +7,9 @@
     <div class="form-group">
         <label class="control-label">Select Application</label>
         <select class="form-control" name="make" ic-post-to="/apps" ic-target="#models" ic-indicator="#model-ind">
-            <option value="cc">ClaimCenter</option>
-            <option value="pc">PolicyCenter</option>
-            <option value="bc">BillingCenter</option>
+            <% for(Application app : Application.getAll()) { %>
+            <option value="${app.getFileSystemName()}">${app.getName()}</option>
+            <% } %>
         </select>
     </div>
 </form>
