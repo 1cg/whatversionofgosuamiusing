@@ -5,20 +5,21 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Spliterator;
-import java.util.logging.Filter;
 
 public class Application {
 
-    private class FilterVersion implements FilenameFilter{
+    private class FilterFilesStartWNumber implements FilenameFilter{
         @Override
         public boolean accept(File dir, String name) {
-            return !name.matches("\\..*");
+            return name.matches("[0-9].*");
         }
     }
 
+    private String APP_VERSIONS_SEPARATOR = null;
+    private String VERSION_RELEASES_SEPARATOR = "RELEASES";
     private String name;
     private String fileSystemName;
+
 
     private static List<Application> APPLICATIONS = new ArrayList<>();
     static {
@@ -49,7 +50,29 @@ public class Application {
         String appPathName = buildsDir.getAbsolutePath() +  File.separatorChar + fileSystemName;
         File appFile = new File(appPathName);
         assert(appFile.exists());
-        return Arrays.asList(appFile.list(new FilterVersion()));
+        return Arrays.asList(appFile.list(new FilterFilesStartWNumber()));
+    }
+
+    public List<String> getReleases(String versionName) {
+        String versionPath = Files.getBuildsDir().getAbsolutePath();
+        if (APP_VERSIONS_SEPARATOR == null) {
+            versionPath += File.separatorChar + fileSystemName + File.separatorChar + versionName;
+        } else {
+            versionPath += File.separatorChar + fileSystemName + File.separatorChar + APP_VERSIONS_SEPARATOR + File.separatorChar + versionName;
+        }
+
+
+        String releasesDirectoryPath;
+        if (VERSION_RELEASES_SEPARATOR == null) {
+            releasesDirectoryPath = versionPath;
+        } else {
+            releasesDirectoryPath = versionPath + File.separatorChar + VERSION_RELEASES_SEPARATOR;
+        }
+        File releasesDirectory = new File(releasesDirectoryPath);
+        assert(releasesDirectory.exists());
+
+
+        return Arrays.asList(releasesDirectory.list(new FilterFilesStartWNumber()));
     }
 
     @Override
@@ -62,7 +85,11 @@ public class Application {
 
     public static void main(String[] args) {
         for (Application app : APPLICATIONS) {
-            System.out.println(app.getVersions().toString());
+            System.out.println(app.getName());
+            List<String> versions = app.getVersions();
+            for (String versionName : versions) {
+                System.out.println(versionName + ": " + app.getReleases(versionName));
+            }
         }
     }
 
