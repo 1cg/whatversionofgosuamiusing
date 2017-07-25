@@ -3,7 +3,6 @@ package app;
 
 /**The code in this file is derived from www.codejava.net*/
 
-
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,7 +16,7 @@ import java.util.zip.ZipInputStream;
 public class UnzipUtility {
 
     private static final int BUFFER_SIZE = 4096;
-
+    private static final String UNZIP_DESTINATION = "./UnzippedFiles"; //@TODO: I am 100% sure this is wrong
 
     public List<String> getFileNamesFromZip(String zipFilePath) throws IOException {
         ArrayList<String> fileNames = new ArrayList<>();
@@ -31,6 +30,26 @@ public class UnzipUtility {
         }
         zipIn.close();
         return fileNames;
+    }
+
+    public void getFileFromZip(String zipFilePath, String fileName) throws IOException {
+        File destDir = new File(UNZIP_DESTINATION);
+        if (!destDir.exists()) {
+            destDir.mkdir();
+        }
+        ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath));
+        ZipEntry entry = zipIn.getNextEntry();
+        // iterates over entries in the zip file
+        while (entry != null) {
+            if (entry.getName().equals(fileName)) {
+                String filePath = UNZIP_DESTINATION + File.separator + entry.getName();
+                extractFile(zipIn, filePath);
+                break;
+            }
+            zipIn.closeEntry();
+            entry = zipIn.getNextEntry();
+        }
+        zipIn.close();
     }
 
     public void unzip(String zipFilePath, String destDirectory) throws IOException {
