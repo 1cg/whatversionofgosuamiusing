@@ -34,13 +34,20 @@ public class Server {
                 return "";
             } else {
                 resp.header("X-IC-PushURL", "/" + app + "/" + version);
-                return Releases.render(Application.getByCode(app).getReleases(version));
+                return Releases.render(Application.getByCode(app), version);
             }
         });
 
         get("/", (req, resp) -> Index.render(null, null));
         get("/:app", (req, resp) -> Index.render(Application.getByCode(req.params("app")), null));
         get("/:app/:version", (req, resp) -> Index.render(Application.getByCode(req.params("app")), req.params("version")));
+
+        get("/:app/:version/:release", (req, resp) -> {
+            String app = req.queryParams("app");
+            String version = req.queryParams("version");
+            String release = req.queryParams("release");
+            return Explore.render(Application.getByCode(app), version, release);
+        });
 
         Main.main(args); // start up a jconsole TODO only in dev mode
     }

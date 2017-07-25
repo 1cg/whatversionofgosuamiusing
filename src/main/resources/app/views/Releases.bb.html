@@ -1,5 +1,5 @@
-<%@ import java.util.* %>
-<%@ params(List<String> releases) %>
+<%@ import app.model.* %>
+<%@ params(Application selectedApp, String selectedVersion) %>
 
 <h2>RELEASES</h2>
 
@@ -12,13 +12,18 @@
         <th>
             Gosu Version
         </th>
+        <th>
+        </th>
     </tr>
     </thead>
     <tbody>
-    <% for(String release: releases) { %>
+    <% for(String release: selectedApp.getReleases(selectedVersion)) { %>
     <tr>
         <td>${release}</td>
         <td>Unknown</td>
+        <td>
+            <a href='/${selectedApp.getFileSystemName() + "/" + selectedVersion + "/" + release}'>Explore >>></a>
+        </td>
     </tr>
     <% } %>
     </tbody>
