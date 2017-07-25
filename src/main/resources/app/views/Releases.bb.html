@@ -1,0 +1,25 @@
+<%@ import java.util.* %>
+<%@ params(List<String> releases) %>
+
+<h2>RELEASES</h2>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>
+            Release
+        </th>
+        <th>
+            Gosu Version
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    <% for(String release: releases) { %>
+    <tr>
+        <td>${release}</td>
+        <td>Unknown</td>
+    </tr>
+    <% } %>
+    </tbody>
+</table>

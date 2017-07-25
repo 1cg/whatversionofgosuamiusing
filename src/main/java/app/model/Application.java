@@ -8,6 +8,10 @@ import java.util.List;
 
 public class Application {
 
+    public static Application getByCode(String app) {
+        return APPLICATIONS.stream().filter(application -> application.getFileSystemName().equals(app)).findFirst().orElse(null);
+    }
+
     private class FilterFilesStartWNumber implements FilenameFilter{
         @Override
         public boolean accept(File dir, String name) {
@@ -45,7 +49,7 @@ public class Application {
         return APPLICATIONS;
     }
 
-    private List<String> getVersions() {
+    public List<String> getVersions() {
         File buildsDir = Files.getBuildsDir();
         String appPathName = buildsDir.getAbsolutePath() +  File.separatorChar + fileSystemName;
         File appFile = new File(appPathName);
@@ -53,7 +57,7 @@ public class Application {
         return Arrays.asList(appFile.list(new FilterFilesStartWNumber()));
     }
 
-    private List<String> getReleases(String versionName) {
+    public List<String> getReleases(String versionName) {
         String versionPath = Files.getBuildsDir().getAbsolutePath();
         if (APP_VERSIONS_SEPARATOR == null) {
             versionPath += File.separatorChar + fileSystemName + File.separatorChar + versionName;
