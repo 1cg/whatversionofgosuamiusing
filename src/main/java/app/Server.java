@@ -16,36 +16,20 @@ public class Server {
 
         BBSparkTemplate.init();
 
-        File buildsDir = Files.getBuildsDir();
+        get("/", (req, resp) -> Index.render());
 
-        get("/", (req, resp)-> Index.render());
-
-        get("/apps", (req, resp) -> {
-            String applicationName = req.session().attribute("ApplicationName");
+        get("/major_versions", (req, resp) -> {
+            String applicationName = req.queryParams("app");
             return Index.MajorVersions.render(applicationName);
         });
 
-        post("/apps", (req, resp) -> {
-            String applicationName = req.queryParams("app");
-            req.session().attribute("ApplicationName", applicationName);
-            return Index.render();
-        });
-
-        post("/releases", (req, resp) -> {
-           String versionName = req.queryParams("version");
-           req.session().attribute("ReleaseName", versionName);
-           return Index.render();
-        });
-
         get("/releases", (req, resp) -> {
-            String applicationName = req.session().attribute("ApplicationName");
-            String versionName = req.session().attribute("ReleaseName");
-           return Index.Releases.render(applicationName, versionName);
+            String applicationName = req.queryParams("app");
+            String majorVersion = req.queryParams("major-version");
+            return Index.Releases.render(applicationName, majorVersion);
         });
 
-        Main.main(args);
-
-
+        Main.main(args); // start up a jconsole TODO only in dev mode
     }
 
 }
