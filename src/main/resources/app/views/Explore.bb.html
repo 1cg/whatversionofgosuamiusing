@@ -1,8 +1,36 @@
 <%@ layout Layout %>
 <%@ import app.model.* %>
 
-<%@ params(Application selectedApp, String selectedVersion, String Release) %>
+<%@ params(Application selectedApp, String selectedVersion, String release, String path) %>
 
 <h2>Explore Release</h2>
 
 TODO - EXPLORER UI
+
+<form class="form-inline">
+    <label class="sr-only" for="version">Gosu Version</label>
+    <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" name="version" id="version" placeholder="Enter Gosu Versions">
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+<hr/>
+
+<div>
+    <h3>App</h3>
+    ${selectedApp.getName()}
+</div>
+
+<div>
+    <h3>Version</h3>
+    ${selectedVersion}
+</div>
+
+<div>
+    <h3>Release</h3>
+    ${release}
+</div>
+
+<div>
+    <h3>Path</h3>
+    ${path}
+</div>
