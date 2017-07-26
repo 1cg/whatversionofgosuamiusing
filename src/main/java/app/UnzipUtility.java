@@ -32,6 +32,7 @@ public class UnzipUtility {
         return fileNames;
     }
 
+
     public void getFileFromZip(String zipFilePath, String fileName) throws IOException {
         File destDir = new File(UNZIP_DESTINATION);
         if (!destDir.exists()) {
@@ -39,16 +40,18 @@ public class UnzipUtility {
         }
         ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath));
         ZipEntry entry = zipIn.getNextEntry();
+        String filePath = null;
         // iterates over entries in the zip file
         while (entry != null) {
             if (entry.getName().equals(fileName)) {
-                String filePath = UNZIP_DESTINATION + File.separator + entry.getName();
-                extractFile(zipIn, filePath);
+                filePath = UNZIP_DESTINATION + File.separator + entry.getName();
                 break;
             }
             zipIn.closeEntry();
             entry = zipIn.getNextEntry();
         }
+        assert (filePath != null);
+        extractFile(zipIn, filePath);
         zipIn.close();
     }
 
