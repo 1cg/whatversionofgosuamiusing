@@ -9,12 +9,11 @@ import java.util.List;
 public class Version {
     File versionFile;
     Application parent;
-    List<Release> releases;
+    List<Release> releases = null;
 
-    public Version(File versionFile, Application parent, List<Release> releases) {
+    public Version(File versionFile, Application parent) {
         this.versionFile = versionFile;
         this.parent = parent;
-        this.releases = releases;
         findReleases();
     }
 
@@ -23,6 +22,9 @@ public class Version {
     }
 
     public List<Release> getReleases(){
+        if (releases == null) {
+            findReleases();
+        }
         return releases;
     }
 }
