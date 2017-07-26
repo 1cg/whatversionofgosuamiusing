@@ -16,7 +16,7 @@ import java.util.zip.ZipInputStream;
 public class UnzipUtility {
 
     private static final int BUFFER_SIZE = 4096;
-    private static final String UNZIP_DESTINATION = "./UnzippedFiles"; //@TODO: I am 100% sure this is wrong
+    private static final String UNZIP_DESTINATION =  "./UnzippedFiles"; //@TODO: I am 100% sure this is wrong
 
     public List<String> getFileNamesFromZip(String zipFilePath) throws IOException {
         ArrayList<String> fileNames = new ArrayList<>();
