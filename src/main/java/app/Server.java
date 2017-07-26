@@ -7,6 +7,8 @@ import javarepl.Main;
 import app.views.*;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import static spark.Spark.*;
 
@@ -42,11 +44,12 @@ public class Server {
         get("/:app", (req, resp) -> Index.render(Application.getByCode(req.params("app")), null));
         get("/:app/:version", (req, resp) -> Index.render(Application.getByCode(req.params("app")), req.params("version")));
 
-        get("/:app/:version/:release", (req, resp) -> {
-            String app = req.queryParams("app");
-            String version = req.queryParams("version");
-            String release = req.queryParams("release");
-            return Explore.render(Application.getByCode(app), version, release);
+        get("/:app/:version/:release/*", (req, resp) -> {
+            String app = req.params("app");
+            String version = req.params("version");
+            String release = req.params("release");
+            String path = Arrays.asList(req.splat()).stream().collect(Collectors.joining("/"));
+            return Explore.render(Application.getByCode(app), version, release, path);
         });
 
         Main.main(args); // start up a jconsole TODO only in dev mode
