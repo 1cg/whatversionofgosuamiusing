@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.zip.ZipEntry;
 
 /**
  * Created by hkalidhindi on 7/26/2017.
@@ -44,6 +45,13 @@ public class Resource {
                 needsToBeExtracted = false;
             }
         }
+    }
+
+    public Resource(ZipEntry zipEntry, Resource parent) {
+        this.self = new File(zipEntry.getName());
+        this.parent = parent;
+        this.isDirectory = (zipEntry.isDirectory() || self.getName().endsWith(".zip") || self.getName().endsWith(".jar"));
+        needsToBeExtracted = true;
     }
 
     public boolean isDirectory() {
@@ -94,22 +102,21 @@ public class Resource {
         ensureExtracted();
         resources = new ArrayList<>();
 
-
-        List<File> resourceFiles;
         if (self.getName().endsWith(".zip") || self.getName().endsWith(".jar")) {
             try {
-                resourceFiles = UnzipUtility.getFileListFromZip(self.getAbsolutePath());
+                List<ZipEntry> zipeEntries = UnzipUtility.getEntriesFromZip(self.getAbsolutePath());
+                for (ZipEntry zipEntry : zipeEntries) {
+                    resources.add(new Resource(zipEntry, this));
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         } else {
             assert(self.isDirectory());
-            resourceFiles = Arrays.asList(self.listFiles());
-        }
-
-
-        for (File resourceFile : resourceFiles) {
-            resources.add(new Resource(resourceFile, this));
+            List<File> resourceFiles = Arrays.asList(self.listFiles());
+            for (File resourceFile : resourceFiles) {
+                resources.add(new Resource(resourceFile, this));
+            }
         }
     }
 
