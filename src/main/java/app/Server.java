@@ -19,29 +19,35 @@ public class Server {
 
         BBSparkTemplate.init();
 
-        get("/versions", (req, resp) -> {
-            String app = req.queryParams("app");
-            if (app.isEmpty()) {
-                return "";
+        get("/", (req, resp) -> {
+            if ("versions".equals(req.queryParams("ic-target-id"))) {
+                String app = req.queryParams("app");
+                if (app.isEmpty()) {
+                    return "";
+                } else {
+                    resp.header("X-IC-PushURL", "/" + app);
+                    return Index.Versions.render(Application.getByCode(app), null);
+                }
             } else {
-                resp.header("X-IC-PushURL", "/" + app);
-                return Versions.render(Application.getByCode(app), null);
+                return Index.render(null, null);
             }
         });
 
-        get("/releases", (req, resp) -> {
-            String app = req.queryParams("app");
-            String version = req.queryParams("version");
-            if (version.isEmpty()) {
-                return "";
+        get("/:app", (req, resp) -> {
+            if ("releases".equals(req.queryParams("ic-target-id"))) {
+                String app = req.queryParams("app");
+                String version = req.queryParams("version");
+                if (version.isEmpty()) {
+                    return "";
+                } else {
+                    resp.header("X-IC-PushURL", "/" + app + "/" + version);
+                    return Index.Versions.Releases.render(Application.getByCode(app), version);
+                }
             } else {
-                resp.header("X-IC-PushURL", "/" + app + "/" + version);
-                return Releases.render(Application.getByCode(app), version);
+                return Index.render(Application.getByCode(req.params("app")), null);
             }
         });
 
-        get("/", (req, resp) -> Index.render(null, null));
-        get("/:app", (req, resp) -> Index.render(Application.getByCode(req.params("app")), null));
         get("/:app/:version", (req, resp) -> Index.render(Application.getByCode(req.params("app")), req.params("version")));
 
         get("/:app/:version/:release/*", (req, resp) -> {
@@ -49,10 +55,11 @@ public class Server {
             String version = req.params("version");
             String release = req.params("release");
             String path = Arrays.asList(req.splat()).stream().collect(Collectors.joining("/"));
-            return Explore.render(Application.getByCode(app), version, release, path);
+            Application appByCode = Application.getByCode(app);
+            return Explore.render(appByCode, version, release, path);
         });
 
-        Main.main(args); // start up a jconsole TODO only in dev mode
+        //Main.main(args); // start up a jconsole TODO only in dev mode
     }
 
 }

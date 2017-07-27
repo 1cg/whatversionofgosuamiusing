@@ -7,7 +7,7 @@
 <form>
     <div class="form-group">
         <label class="control-label">Select Application</label>
-        <select class="form-control" name="app" ic-get-from="/versions" ic-target="#versions">
+        <select class="form-control" name="app" ic-get-from="/" ic-target="#versions">
             <option value="NO APP">Select an Application</option>
             <% for(Application app : Application.getAll()) { %>
             <option value="${app.getFileSystemName()}" ${app.equals(selectedApp) ? "selected" : null}>
@@ -19,7 +19,52 @@
 
     <div id="versions" class="form-group">
         <% if(selectedApp != null) { %>
-          <%@ include Versions(selectedApp, selectedVersion) %>
+        <%@ section Versions(selectedApp, selectedVersion) %>
+        <label class="control-label">Select Version</label>
+
+        <select class="form-control" name="version" ic-get-from="/${selectedApp.getFileSystemName()}" ic-target="#releases" ic-include='{"app":"${selectedApp.getFileSystemName()}"}'>
+            <option value="">Select a Major Version</option>
+            <% for(String version: selectedApp.getVersions()) { %>
+            <option value="${version}" ${version.equals(selectedVersion) ? "selected" : null}>
+            ${version}
+            </option>
+            <% } %>
+        </select>
+
+        <div id="releases">
+            <% if(selectedVersion != null) { %>
+            <%@ section Releases(selectedApp, selectedVersion) %>
+            <h2>RELEASES</h2>
+
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>
+                        Release
+                    </th>
+                    <th>
+                        Gosu Version
+                    </th>
+                    <th>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <% for(String release: selectedApp.getReleases(selectedVersion)) { %>
+                <tr>
+                    <td>${release}</td>
+                    <td>Unknown</td>
+                    <td>
+                        <a href='/${selectedApp.getFileSystemName() + "/" + selectedVersion + "/" + release + "/"}'>Explore >>></a>
+                    </td>
+                </tr>
+                <% } %>
+                </tbody>
+            </table>
+            <%@ end section %>
+            <% } %>
+        </div>
+        <%@ end section %>
         <% } %>
     </div>
 
