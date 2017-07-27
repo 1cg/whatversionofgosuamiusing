@@ -32,7 +32,7 @@
             <version>3.4.2</version>
         </dependency>
         <dependency>
-            <groupId>org.manifold-systems</groupId>
+            <groupId>systems.manifold</groupId>
             <artifactId>manifold</artifactId>
             <version>0.1-SNAPSHOT</version>
             <scope>system</scope>
