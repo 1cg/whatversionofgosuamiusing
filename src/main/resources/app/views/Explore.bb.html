@@ -1,16 +1,39 @@
 <%@ layout Layout %>
 <%@ import app.model.* %>
 
-<%@ params(Application selectedApp, String selectedVersion, String release, String path) %>
+<%@ params(Application selectedApp, Version selectedVersion, Release release, Resource selectedResource, String path) %>
+<ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/${selectedApp.getFileSystemName()}">${selectedApp.getName()}</a></li>
+    <li><a href="/${selectedApp.getFileSystemName() + "/" + selectedVersion.getName()}">${selectedVersion.getName()}</a></li>
+    <li><a href="/${selectedApp.getFileSystemName() + "/" + selectedVersion.getName() + "/" + release.getName() + "/"}">${release.getName()}</a></li>
+</ol>
+
+<hr/>
 
 <h2>Explore Release</h2>
 
-TODO - EXPLORER UI
+<% if (selectedResource.isDirectory()) { %>
+<div class="list-group">
+    <% for (Resource r: selectedResource.getResources()) { %>
+        <a href="/${selectedApp.getFileSystemName() + "/" + selectedVersion.getName() + "/" + release.getName() + "/" + path + "/" + r.getName() + "/"}" class="list-group-item">
+            ${r.getName()}
+        <% if (r.isDirectory()) { %>
+            <i class="fa fa-folder-open" aria-hidden="true"></i>
+        <% } %>
+        </a>
+    <% } %>
+</div>
+<% } else { %>
+    ${selectedResource.getContent()}
+<% } %>
+
+<hr/>
 
 <form class="form-inline">
     <label class="sr-only" for="version">Gosu Version</label>
     <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" name="version" id="version" placeholder="Enter Gosu Versions">
-    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="submit" class="btn btn-primary" >Save</button>
 </form>
 
 <hr/>
@@ -22,12 +45,12 @@ TODO - EXPLORER UI
 
 <div>
     <h3>Version</h3>
-    ${selectedVersion}
+    ${selectedVersion.getName()}
 </div>
 
 <div>
     <h3>Release</h3>
-    ${release}
+    ${release.getName()}
 </div>
 
 <div>

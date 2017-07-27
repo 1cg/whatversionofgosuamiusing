@@ -27,6 +27,10 @@ public class Version {
         this.parent = parent;
     }
 
+    public String getName() {
+        return versionFile.getName();
+    }
+
     private void findReleases(){
         File RELEASE = getRELEASEFile();
         releases = new ArrayList<>();
@@ -39,7 +43,7 @@ public class Version {
 
 
     private File getRELEASEFile() {
-        File RELEASE = new File(versionFile.getAbsolutePath() + File.separatorChar + "RELEASE");
+        File RELEASE = new File(versionFile.getAbsolutePath() + File.separatorChar + "RELEASES");
         assert(RELEASE.exists());
         assert(RELEASE.isDirectory());
         return RELEASE;

@@ -1,6 +1,9 @@
 package app;
 
 import app.model.Application;
+import app.model.Release;
+import app.model.Resource;
+import app.model.Version;
 import bb.sparkjava.BBSparkTemplate;
 import app.views.*;
 
@@ -53,7 +56,15 @@ public class Server {
             String release = req.params("release");
             String path = Arrays.asList(req.splat()).stream().collect(Collectors.joining("/"));
             Application appByCode = Application.getAppByFileName(app);
-            return Explore.render(appByCode, version, release, path);
+            Version versionByCode = appByCode.getVersionByName(version);
+            Release releaseByCode = versionByCode.getReleaseByName(release);
+            Resource selectedResource = releaseByCode;
+            if (path.length() > 0) {
+                for (String pathFragment : path.split("/")) {
+                    selectedResource = selectedResource.getResourceByName(pathFragment);
+                }
+            }
+            return Explore.render(appByCode, versionByCode, releaseByCode, selectedResource, path);
         });
 
         //Main.main(args); // start up a jconsole TODO only in dev mode

@@ -104,7 +104,7 @@ public class Resource {
             }
         } else {
             assert(self.isDirectory());
-            releasesFiles = Arrays.asList(self.listFiles(new FilterFilesStartWNumber()));
+            releasesFiles = Arrays.asList(self.listFiles());
         }
 
 
