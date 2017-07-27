@@ -1,5 +1,9 @@
 # Created by .ignore support plugin (hsz.mobi)
 ### Java template
+#cache of unzipped files
+src/main/resources/UnzippedFiles
+
+
 # Compiled class file
 *.class
 
