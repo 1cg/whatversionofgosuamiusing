@@ -12,8 +12,13 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 public class UnzipUtility {
@@ -23,17 +28,12 @@ public class UnzipUtility {
 
 
     public static List<File> getFileListFromZip(String zipFilePath) throws IOException {
-        ArrayList<File> filesList = new ArrayList<>();
-        ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath));
-        ZipEntry entry = zipIn.getNextEntry();
-        // iterates over entries in the zip file
-        while (entry != null) {
-            filesList.add(new File(entry.getName()));
-            zipIn.closeEntry();
-            entry = zipIn.getNextEntry();
+        try (ZipFile zipFile = new ZipFile(zipFilePath)) {
+            return Collections.list(zipFile.entries())
+                    .stream()
+                    .map(o -> new File(o.getName()))
+                    .collect(Collectors.toList());
         }
-        zipIn.close();
-        return filesList;
     }
 
 
