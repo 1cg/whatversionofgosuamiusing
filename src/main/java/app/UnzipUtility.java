@@ -19,16 +19,8 @@ import java.util.zip.ZipInputStream;
 public class UnzipUtility {
 
     private static final int BUFFER_SIZE = 4096;
-    private static String UNZIP_DESTINATION;
-    static {
-        try {
-            URL resource = UnzipUtility.class.getResource("unzipped_files");
-            UNZIP_DESTINATION = Paths.get(resource.toURI()).toFile().getAbsolutePath();
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
+    private static String UNZIP_DESTINATION = "unzipped_cache";
 
-    }
 
     public static List<File> getFileListFromZip(String zipFilePath) throws IOException {
         ArrayList<File> filesList = new ArrayList<>();
