@@ -17,7 +17,6 @@ src/main/resources/UnzippedFiles
 .mtj.tmp/
 
 # Package Files #
-*.jar
 *.war
 *.ear
 *.zip

@@ -25,7 +25,7 @@ public class UnzipUtility {
             URL resource = UnzipUtility.class.getResource("UnzippedFiles");
             UNZIP_DESTINATION = Paths.get(resource.toURI()).toFile().getAbsolutePath();
         } catch (URISyntaxException e) {
-            //@TODO: I don't know how to handle this
+            throw new RuntimeException(e);
         }
 
     }
