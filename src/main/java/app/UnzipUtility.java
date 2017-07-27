@@ -22,7 +22,7 @@ public class UnzipUtility {
     private static String UNZIP_DESTINATION;
     static {
         try {
-            URL resource = UnzipUtility.class.getResource("UnzippedFiles");
+            URL resource = UnzipUtility.class.getResource("unzipped_files");
             UNZIP_DESTINATION = Paths.get(resource.toURI()).toFile().getAbsolutePath();
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);

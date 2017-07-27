@@ -26,40 +26,67 @@ public class Resource {
     File self;
     Resource parent;
     List<Resource> resources;
-    boolean alreadyExtracted = false;
+    boolean needsToBeExtracted;
+    private boolean isDirectory;
 
 
     public Resource(File self, Resource parent) {
         this.self = self;
         this.parent = parent;
+        this.isDirectory = (self.isDirectory() || self.getName().endsWith(".zip") || self.getName().endsWith(".jar"));
         if (parent == null) {
-            alreadyExtracted = true;
+            //release
+            needsToBeExtracted = false;
+        } else {
+            if (parent.self.getName().endsWith(".zip") || parent.self.getName().endsWith(".jar")) {
+                needsToBeExtracted = true;
+            } else {
+                needsToBeExtracted = false;
+            }
         }
     }
 
+    public boolean isDirectory() {
+        return isDirectory;
+    }
+
+    //ex. Server.java
     public String getName() {
         return self.getName();
     }
 
     //if is a directory
     public List<Resource> getResources() {
-        assert (self.isDirectory() || self.getName().endsWith(".zip") || self.getName().endsWith(".jar"));
+        assert isDirectory;
         if (resources == null) {
             findResources();
         }
         return resources;
     }
 
+    //if is a directory
+    public Resource getResourceByName(String resourceName) {
+        assert isDirectory;
+        if (resources == null) {
+            findResources();
+        }
+        for (Resource resource : resources) {
+            if (resource.getName().equals(resourceName)) {
+                return resource;
+            }
+        }
+        return null;
+    }
+
     //if is a non-directory
     public String getContent() {
         ensureExtracted();
-        assert(self.isFile());
+        assert(!isDirectory);
         assert(self.canRead());
         try {
             return new String(Files.readAllBytes(Paths.get(self.getAbsolutePath())));
         } catch (IOException e){
-            //@TODO: handle
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
@@ -88,9 +115,9 @@ public class Resource {
 
     //if your parent is a zip, extract yourself
     private void ensureExtracted() {
-        if (!alreadyExtracted) {
+        if (needsToBeExtracted) {
             assert(self.exists());
-            if (parent.self.getName().endsWith(".zip") || parent.self.getName().endsWith(".jar")) {
+            {
                 try {
                     self = UnzipUtility.unzipFileFromZip(parent.self.getAbsolutePath(), self.getName());
                 } catch (IOException e) {
@@ -99,6 +126,6 @@ public class Resource {
             }
             assert(self.exists());
         }
-        alreadyExtracted = true;
+        needsToBeExtracted = false;
     }
 }

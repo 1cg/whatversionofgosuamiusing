@@ -51,4 +51,16 @@ public class Version {
         }
         return releases;
     }
+
+    public Release getReleaseByName(String releaseName) {
+        if (releases == null) {
+            findReleases();
+        }
+        for (Release release : releases) {
+            if (release.getName().equals(releaseName)) {
+                return release;
+            }
+        }
+        return null;
+    }
 }
