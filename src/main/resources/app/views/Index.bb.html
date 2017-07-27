@@ -1,35 +1,32 @@
 <%@ layout Layout %>
-<%@ import app.model.*; %>
+<%@ import app.model.* %>
+<%@ extends app.view.AppTemplate %>
 <%@ params(Application selectedApp, String selectedVersion) %>
 
-<h3>What Version of Gosu Am I Using?</h3>
+<h1 class="text-center">What Version of Gosu Am I Using?</h1>
 
 <form>
     <div class="form-group">
-        <label class="control-label">Select Application</label><i id="Application-Spinner" class="fa fa-spinner fa-spin" style="display:none"></i>
-        <select class="form-control" name="app" ic-get-from="/" ic-target="#versions" ic-indicator="#Application-Spinner">
+        <label class="control-label">
+            Select Application <i id="version-ind" class="fa fa-spinner fa-spin" style="display:none"></i>
+        </label>
+        <select class="form-control" name="app" ic-get-from="/" ic-target="#versions" ic-indicator="#version-ind">
             <option value="NO APP">Select an Application</option>
-            <% for(Application app : Application.getAll()) { %>
-            <option value="${app.getFileSystemName()}" ${app.equals(selectedApp) ? "selected" : null}>
-                ${app.getName()}
-            </option>
-            <% } %>
+            ${listOptions(Application.getAll(), Application::getName, Application::getFileSystemName, selectedApp)}
         </select>
     </div>
 
     <div id="versions" class="form-group">
         <% if(selectedApp != null) { %>
         <%@ section Versions(selectedApp, selectedVersion) %>
-        <label class="control-label">Select Version</label><i id="Version-Spinner" class="fa fa-spinner fa-spin" style="display:none"></i>
+        <label class="control-label">
+            Select Version <i id="release-ind" class="fa fa-spinner fa-spin" style="display:none"></i>
+        </label>
 
-        <select class="form-control" name="version" ic-get-from="/${selectedApp.getFileSystemName()}"
-        ic-target="#releases" ic-include='{"app":"${selectedApp.getFileSystemName()}"}' ic-indicator="#Version-Spinner">
+        <select class="form-control" name="version" ic-get-from="/${selectedApp.getFileSystemName()}" ic-target="#releases"
+                ic-include='{"app":"${selectedApp.getFileSystemName()}"}' ic-indicator="#release-ind">
             <option value="">Select a Major Version</option>
-            <% for(String version: selectedApp.getVersionsNames()) { %>
-            <option value="${version}" ${version.equals(selectedVersion) ? "selected" : null}>
-            ${version}
-            </option>
-            <% } %>
+            ${listOptions(selectedApp.getVersionsNames(), selectedVersion)}
         </select>
 
         <div id="releases">
