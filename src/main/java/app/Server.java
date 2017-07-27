@@ -1,12 +1,9 @@
 package app;
 
 import app.model.Application;
-import app.model.Files;
 import bb.sparkjava.BBSparkTemplate;
-import javarepl.Main;
 import app.views.*;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -26,7 +23,7 @@ public class Server {
                     return "";
                 } else {
                     resp.header("X-IC-PushURL", "/" + app);
-                    return Index.Versions.render(Application.getByCode(app), null);
+                    return Index.Versions.render(Application.getAppByFileName(app), null);
                 }
             } else {
                 return Index.render(null, null);
@@ -41,21 +38,21 @@ public class Server {
                     return "";
                 } else {
                     resp.header("X-IC-PushURL", "/" + app + "/" + version);
-                    return Index.Versions.Releases.render(Application.getByCode(app), version);
+                    return Index.Versions.Releases.render(Application.getAppByFileName(app), version);
                 }
             } else {
-                return Index.render(Application.getByCode(req.params("app")), null);
+                return Index.render(Application.getAppByFileName(req.params("app")), null);
             }
         });
 
-        get("/:app/:version", (req, resp) -> Index.render(Application.getByCode(req.params("app")), req.params("version")));
+        get("/:app/:version", (req, resp) -> Index.render(Application.getAppByFileName(req.params("app")), req.params("version")));
 
         get("/:app/:version/:release/*", (req, resp) -> {
             String app = req.params("app");
             String version = req.params("version");
             String release = req.params("release");
             String path = Arrays.asList(req.splat()).stream().collect(Collectors.joining("/"));
-            Application appByCode = Application.getByCode(app);
+            Application appByCode = Application.getAppByFileName(app);
             return Explore.render(appByCode, version, release, path);
         });
 

@@ -25,7 +25,7 @@
         <select class="form-control" name="version" ic-get-from="/${selectedApp.getFileSystemName()}"
         ic-target="#releases" ic-include='{"app":"${selectedApp.getFileSystemName()}"}' ic-indicator="#Version-Spinner">
             <option value="">Select a Major Version</option>
-            <% for(String version: selectedApp.getVersions()) { %>
+            <% for(String version: selectedApp.getVersionsNames()) { %>
             <option value="${version}" ${version.equals(selectedVersion) ? "selected" : null}>
             ${version}
             </option>
@@ -51,7 +51,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <% for(String release: selectedApp.getReleases(selectedVersion)) { %>
+                <% for(String release: selectedApp.getReleasesNames(selectedVersion)) { %>
                 <tr>
                     <td>${release}</td>
                     <td>Unknown</td>
