@@ -8,6 +8,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -16,7 +19,16 @@ import java.util.zip.ZipInputStream;
 public class UnzipUtility {
 
     private static final int BUFFER_SIZE = 4096;
-    private static final String UNZIP_DESTINATION =  "./UnzippedFiles"; //@TODO: I am 100% sure this is wrong
+    private static String UNZIP_DESTINATION;
+    static {
+        try {
+            URL resource = UnzipUtility.class.getResource("UnzippedFiles");
+            UNZIP_DESTINATION = Paths.get(resource.toURI()).toFile().getAbsolutePath();
+        } catch (URISyntaxException e) {
+            //@TODO: I don't know how to handle this
+        }
+
+    }
 
     public static List<File> getFileListFromZip(String zipFilePath) throws IOException {
         ArrayList<File> filePaths = new ArrayList<>();
