@@ -18,22 +18,23 @@ public class UnzipUtility {
     private static final int BUFFER_SIZE = 4096;
     private static final String UNZIP_DESTINATION =  "./UnzippedFiles"; //@TODO: I am 100% sure this is wrong
 
-    public List<String> getFileNamesFromZip(String zipFilePath) throws IOException {
-        ArrayList<String> fileNames = new ArrayList<>();
+    public static List<File> getFileListFromZip(String zipFilePath) throws IOException {
+        ArrayList<File> filePaths = new ArrayList<>();
         ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath));
         ZipEntry entry = zipIn.getNextEntry();
         // iterates over entries in the zip file
         while (entry != null) {
-            fileNames.add(new File(entry.getName()).getName());
+            filePaths.add(new File(entry.getName()));
             zipIn.closeEntry();
             entry = zipIn.getNextEntry();
         }
         zipIn.close();
-        return fileNames;
+        return filePaths;
     }
 
+
     //fileName ex: Server.java
-    public void getFileFromZip(String zipFilePath, String fileName) throws IOException {
+    public static File unzipFileFromZip(String zipFilePath, String fileName) throws IOException {
         File destDir = new File(UNZIP_DESTINATION);
         if (!destDir.exists()) {
             destDir.mkdir();
@@ -54,9 +55,10 @@ public class UnzipUtility {
         assert (filePath != null);
         extractFile(zipIn, filePath);
         zipIn.close();
+        return new File(filePath);
     }
 
-    public void unzip(String zipFilePath, String destDirectory) throws IOException {
+    public static void unzip(String zipFilePath, String destDirectory) throws IOException {
         File destDir = new File(destDirectory);
         if (!destDir.exists()) {
             destDir.mkdir();
@@ -79,7 +81,7 @@ public class UnzipUtility {
         }
         zipIn.close();
     }
-    private void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
+    private static void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
         byte[] bytesIn = new byte[BUFFER_SIZE];
         int read = 0;
