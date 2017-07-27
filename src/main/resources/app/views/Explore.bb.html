@@ -7,8 +7,14 @@
     <li><a href="/${selectedApp.getFileSystemName()}">${selectedApp.getName()}</a></li>
     <li><a href="/${selectedApp.getFileSystemName() + "/" + selectedVersion.getName()}">${selectedVersion.getName()}</a></li>
     <li><a href="/${selectedApp.getFileSystemName() + "/" + selectedVersion.getName() + "/" + release.getName() + "/"}">${release.getName()}</a></li>
+    <% if (path.length() > 0) {
+       String pathBuilder = "";
+       for (String pathFragment : path.split("/")) {
+           pathBuilder = pathBuilder + pathFragment + "/"; %>
+           <li><a href="/${selectedApp.getFileSystemName() + "/" + selectedVersion.getName() + "/" + release.getName() + "/" + pathBuilder}">${pathFragment}</a></li>
+       <% }
+   } %>
 </ol>
-
 <hr/>
 
 <h2>Explore Release</h2>
