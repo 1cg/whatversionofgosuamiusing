@@ -1,7 +1,6 @@
 package app.model;
 
 import app.UnzipUtility;
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -43,7 +42,7 @@ public class Resource {
     }
 
     //if is a directory
-    public List<Resource> getResources() throws IOException {
+    public List<Resource> getResources() {
         assert (self.isDirectory() || self.getName().endsWith(".zip") || self.getName().endsWith(".jar"));
         if (resources == null) {
             findResources();
@@ -52,21 +51,30 @@ public class Resource {
     }
 
     //if is a non-directory
-    public String getContent() throws IOException {
+    public String getContent() {
         ensureExtracted();
         assert(self.isFile());
         assert(self.canRead());
-        return new String(Files.readAllBytes(Paths.get(self.getAbsolutePath())));
+        try {
+            return new String(Files.readAllBytes(Paths.get(self.getAbsolutePath())));
+        } catch (IOException e){
+            //@TODO: handle
+            return null;
+        }
     }
 
-    private void findResources() throws IOException {
+    private void findResources() {
         ensureExtracted();
         resources = new ArrayList<>();
 
 
         List<File> releasesFiles;
         if (self.getName().endsWith(".zip") || self.getName().endsWith(".jar")) {
-            releasesFiles = UnzipUtility.getFileListFromZip(self.getAbsolutePath());
+            try {
+                releasesFiles = UnzipUtility.getFileListFromZip(self.getAbsolutePath());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         } else {
             assert(self.isDirectory());
             releasesFiles = Arrays.asList(self.listFiles(new FilterFilesStartWNumber()));
@@ -79,11 +87,15 @@ public class Resource {
     }
 
     //if your parent is a zip, extract yourself
-    private void ensureExtracted() throws IOException {
+    private void ensureExtracted() {
         if (!alreadyExtracted) {
             assert(self.exists());
             if (parent.self.getName().endsWith(".zip") || parent.self.getName().endsWith(".jar")) {
-                self = UnzipUtility.unzipFileFromZip(parent.self.getAbsolutePath(), self.getName());
+                try {
+                    self = UnzipUtility.unzipFileFromZip(parent.self.getAbsolutePath(), self.getName());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
             assert(self.exists());
         }
