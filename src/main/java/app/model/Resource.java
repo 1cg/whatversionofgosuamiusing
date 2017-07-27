@@ -32,6 +32,9 @@ public class Resource {
     public Resource(File self, Resource parent) {
         this.self = self;
         this.parent = parent;
+        if (parent == null) {
+            alreadyExtracted = true;
+        }
     }
 
     public String getName() {
