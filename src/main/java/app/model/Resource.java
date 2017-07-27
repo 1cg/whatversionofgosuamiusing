@@ -64,8 +64,9 @@ public class Resource {
         }
     }
 
+    //if your parent is a zip, extract yourself
     private void extractSelf() {
-        if (self.getName().endsWith(".zip") || self.getName().endsWith(".jar")) {
+        if (parent.self.getName().endsWith(".zip") || parent.self.getName().endsWith(".jar")) {
             try {
                 self = UnzipUtility.unzipFileFromZip(parent.self.getAbsolutePath(), self.getName());
             } catch (IOException e) {
