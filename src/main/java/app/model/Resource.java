@@ -95,21 +95,21 @@ public class Resource {
         resources = new ArrayList<>();
 
 
-        List<File> releasesFiles;
+        List<File> resourceFiles;
         if (self.getName().endsWith(".zip") || self.getName().endsWith(".jar")) {
             try {
-                releasesFiles = UnzipUtility.getFileListFromZip(self.getAbsolutePath());
+                resourceFiles = UnzipUtility.getFileListFromZip(self.getAbsolutePath());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         } else {
             assert(self.isDirectory());
-            releasesFiles = Arrays.asList(self.listFiles());
+            resourceFiles = Arrays.asList(self.listFiles());
         }
 
 
-        for (File releaseFile : releasesFiles) {
-            resources.add(new Release(releaseFile));
+        for (File resourceFile : resourceFiles) {
+            resources.add(new Resource(resourceFile, this));
         }
     }
 
