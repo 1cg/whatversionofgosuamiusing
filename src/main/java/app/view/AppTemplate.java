@@ -64,21 +64,22 @@ public class AppTemplate extends BaseBBTemplate {
                 if (i == pathArray.length) {
                     sb.append(" active");
                 }
-                sb.append("\">").append(currentResource).append("</a></li>\n");
+                sb.append("\">").append(currentResource).append("</a></li>");
             }
         }
+        sb.append("\n</ol>\n");
         return sb.toString();
     }
 
-    private String pathFor(Application selectedApp) {
+    public String pathFor(Application selectedApp) {
         return "/" + selectedApp.getFileSystemName();
     }
 
-    private String pathFor(Application selectedApp, Version selectedVersion) {
+    public String pathFor(Application selectedApp, Version selectedVersion) {
         return pathFor(selectedApp) + "/" + selectedVersion.getName();
     }
 
-    private String pathFor(Application selectedApp, Version selectedVersion, Release selectedRelease) {
+    public String pathFor(Application selectedApp, Version selectedVersion, Release selectedRelease) {
         return pathFor(selectedApp, selectedVersion) + "/" + selectedRelease.getName() + "/";
     }
 
