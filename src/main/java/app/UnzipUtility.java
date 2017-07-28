@@ -36,6 +36,13 @@ public class UnzipUtility {
         }
     }
 
+    public static List<ZipEntry> getEntriesFromZip(String zipFilePath) throws IOException {
+        try (ZipFile zipFile = new ZipFile(zipFilePath)) {
+            return Collections.list(zipFile.entries())
+                    .stream()
+                    .collect(Collectors.toList());
+        }
+    }
 
     //fileName ex: Server.java
     public static File unzipFileFromZip(String zipFilePath, String fileName) throws IOException {
