@@ -1,6 +1,7 @@
 package app.model;
 
 import app.UnzipUtility;
+import javarepl.internal.totallylazy.io.Zip;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -29,10 +30,12 @@ public class Resource {
     List<Resource> resources;
     boolean needsToBeExtracted;
     private boolean isDirectory;
+    String name;
 
 
     public Resource(File self, Resource parent) {
         this.self = self;
+        this.name = self.getName();
         this.parent = parent;
         this.isDirectory = (self.isDirectory() || self.getName().endsWith(".zip") || self.getName().endsWith(".jar"));
         if (parent == null) {
@@ -48,7 +51,9 @@ public class Resource {
     }
 
     public Resource(ZipEntry zipEntry, Resource parent) {
+        assert(!zipEntry.isDirectory());
         this.self = new File(zipEntry.getName());
+        this.name = zipEntry.getName();
         this.parent = parent;
         this.isDirectory = (zipEntry.isDirectory() || self.getName().endsWith(".zip") || self.getName().endsWith(".jar"));
         needsToBeExtracted = true;
@@ -60,7 +65,7 @@ public class Resource {
 
     //ex. Server.java
     public String getName() {
-        return self.getName();
+        return name;
     }
 
     //if is a directory
@@ -104,9 +109,11 @@ public class Resource {
 
         if (self.getName().endsWith(".zip") || self.getName().endsWith(".jar")) {
             try {
-                List<ZipEntry> zipeEntries = UnzipUtility.getEntriesFromZip(self.getAbsolutePath());
-                for (ZipEntry zipEntry : zipeEntries) {
-                    resources.add(new Resource(zipEntry, this));
+                List<ZipEntry> zipEntries = UnzipUtility.getEntriesFromZip(self.getAbsolutePath());
+                for (ZipEntry zipEntry : zipEntries) {
+                    if (!zipEntry.isDirectory()) {
+                        resources.add(new Resource(zipEntry, this));
+                    }
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
