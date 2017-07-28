@@ -10,7 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -65,10 +65,21 @@ public class UnzipUtility {
         }
         assert (filePath != null);
         extractFile(zipIn, filePath);
+//        Path zipPath = Paths.get((zipFilePath));
+//        Path endLoc = Paths.get(filePath);
+//        extractFile(zipPath, fileName, endLoc);
         zipIn.close();
         return new File(filePath);
     }
 
+    public static void extractFile(Path zipFile, String fileName, Path outputFile) throws IOException {
+        // Wrap the file system in a try-with-resources statement
+        // to auto-close it when finished and prevent a memory leak
+        try (FileSystem fileSystem = FileSystems.newFileSystem(zipFile, null)) {
+            Path fileToExtract = fileSystem.getPath(fileName);
+            Files.copy(fileToExtract, outputFile);
+        }
+    }
 
     private static void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
