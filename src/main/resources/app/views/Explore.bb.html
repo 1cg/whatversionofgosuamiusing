@@ -1,37 +1,10 @@
 <%@ layout Layout %>
 <%@ import app.model.* %>
+<%@ extends app.view.AppTemplate %>
 
 <%@ params(Application selectedApp, Version selectedVersion, Release release, Resource selectedResource, String path, String filter) %>
 
-<%-- TODO: Move Breadcrumb logic into base class --%>
-<ol class="breadcrumb">
-    <li><a href="/">Home</a></li>
-    <li><a href="/${selectedApp.getFileSystemName()}">${selectedApp.getName()}</a></li>
-    <li><a href="/${selectedApp.getFileSystemName() + "/" + selectedVersion.getName()}">${selectedVersion.getName()}</a></li>
-    <li><a href="/${selectedApp.getFileSystemName() + "/" + selectedVersion.getName() + "/" + release.getName() + "/"}">${release.getName()}</a></li>
-    <% if (path.length() > 0) {
-        String[] pathArray = path.split("/");
-        int i = 0;
-        boolean zipped = false;
-        String pathBuilder = "";
-        while(i < pathArray.length) {
-            String currentResource = pathArray[i];
-            if (zipped) {
-                i += 1;
-                while (i < pathArray.length && !(currentResource.endsWith(".zip") || currentResource.endsWith(".jar"))) {
-                    currentResource = currentResource + "/" + pathArray[i++];
-                }
-                i -= 1;
-            }
-            if (currentResource.endsWith(".zip") || currentResource.endsWith(".jar")) {
-                zipped = true;
-            }
-            pathBuilder = pathBuilder + currentResource + "/";
-            i += 1; %>
-            <li><a href="/${selectedApp.getFileSystemName() + "/" + selectedVersion.getName() + "/" + release.getName() + "/" + pathBuilder}">${currentResource}</a></li>
-        <%  }
-    } %>
-</ol>
+${getBreadcrumb(selectedApp, selectedVersion, release, path)}
 <hr/>
 
 <h2>Explore Release<i id="explore-ind" class="fa fa-spinner " style="display: none;"></i></h2>
@@ -56,7 +29,7 @@
 
         <input class="form-control" type="text" name="filter" placeholder="Search Resources"
                value="${filter}"
-               ic-get-from='/${selectedApp.getFileSystemName() + "/" + selectedVersion.getName() + "/" + release.getName() + "/" + path + "/" }'
+               ic-get-from='${pathFor(selectedApp, selectedVersion, release, path)}'
                ic-trigger-on="keyup changed" ic-trigger-delay="500ms"
                ic-target="#resource-list" ic-indicator="#indicator">
     </div>
@@ -69,7 +42,7 @@
     <% if (selectedResource.isDirectory()) { %>
     <div class="list-group" id="explorer">
         <% for (Resource r: selectedResource.getResources(filter)) { %>
-        <a href="/${selectedApp.getFileSystemName() + "/" + selectedVersion.getName() + "/" + release.getName() + "/" + path + "/" + r.getName() + "/"}"
+        <a href="${pathFor(selectedApp, selectedVersion, release, r, path)}"
         class="list-group-item"
         onClick="document.getElementById("explore-ind").classList.remove("invisible-icon")>
         ${r.getName()}
