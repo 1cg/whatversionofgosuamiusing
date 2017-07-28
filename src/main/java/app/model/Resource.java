@@ -100,6 +100,32 @@ public class Resource {
         return null;
     }
 
+    public Resource getResourceByPath(String path) {
+        Resource selectedResource = this;
+        if (path.length() > 0) {
+            String[] pathArray = path.split("/");
+            int i = 0;
+            boolean zipped = false;
+            while (i < pathArray.length) {
+                String currentResource = pathArray[i];
+                if (zipped) {
+                    i += 1;
+                    while (i < pathArray.length && !(currentResource.endsWith(".zip") || currentResource.endsWith(".jar"))) {
+                        currentResource = currentResource + "/" + pathArray[i++];
+                    }
+                    i -= 1;
+                }
+                if (currentResource.endsWith(".zip") || currentResource.endsWith(".jar")) {
+                    zipped = true;
+
+                }
+                selectedResource = selectedResource.getResourceByName(currentResource);
+                i += 1;
+            }
+        }
+        return selectedResource;
+    }
+
     //if is a non-directory
     public String getContent() {
         ensureExtracted();

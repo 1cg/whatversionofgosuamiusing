@@ -55,6 +55,7 @@
         </h3>
 
         <input class="form-control" type="text" name="filter" placeholder="Search Resources"
+               value="${filter}"
                ic-get-from='/${selectedApp.getFileSystemName() + "/" + selectedVersion.getName() + "/" + release.getName() + "/" + path + "/" }'
                ic-trigger-on="keyup changed" ic-trigger-delay="500ms"
                ic-target="#resource-list" ic-indicator="#indicator">

@@ -6,7 +6,9 @@ import app.model.Resource;
 import app.model.Version;
 import bb.sparkjava.BBSparkTemplate;
 import app.views.*;
+import spark.Request;
 
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -51,43 +53,28 @@ public class Server {
         get("/:app/:version", (req, resp) -> Index.render(Application.getAppByFileName(req.params("app")), req.params("version")));
 
         get("/:app/:version/:release/*", (req, resp) -> {
+
             String app = req.params("app");
             String version = req.params("version");
             String release = req.params("release");
             String path = Arrays.asList(req.splat()).stream().collect(Collectors.joining("/"));
+            String filter = req.queryParamOrDefault("filter", "");
+
             Application appByCode = Application.getAppByFileName(app);
             Version versionByCode = appByCode.getVersionByName(version);
             Release releaseByCode = versionByCode.getReleaseByName(release);
-            Resource selectedResource = releaseByCode;
-            if (path.length() > 0) {
-                String[] pathArray = path.split("/");
-                int i = 0;
-                boolean zipped = false;
-                while (i < pathArray.length) {
-                    String currentResource = pathArray[i];
-                    if (zipped) {
-                        i += 1;
-                        while (i < pathArray.length && !(currentResource.endsWith(".zip") || currentResource.endsWith(".jar"))) {
-                            currentResource = currentResource + "/" + pathArray[i++];
-                        }
-                        i -= 1;
-                    }
-                    if (currentResource.endsWith(".zip") || currentResource.endsWith(".jar")) {
-                        zipped = true;
+            Resource selectedResource = releaseByCode.getResourceByPath(path);
 
-                    }
-                    selectedResource = selectedResource.getResourceByName(currentResource);
-                    i += 1;
-                }
-            }
             // filter
             if ("resource-list".equals(req.queryParams("ic-target-id"))) {
+                resp.header("X-IC-PushURL", filterUrl(req, filter));
+
                 return Explore.ResourceList.render(appByCode,
                         versionByCode,
                         releaseByCode,
                         selectedResource,
                         path,
-                        req.queryParamOrDefault("filter", ""));
+                        filter);
 
             } else {
                 // full request
@@ -96,12 +83,20 @@ public class Server {
                         releaseByCode,
                         selectedResource,
                         path,
-                        req.queryParamOrDefault("filter", ""));
+                        filter);
             }
 
         });
 
         //Main.main(args); // start up a jconsole TODO only in dev mode
+    }
+
+    private static String filterUrl(Request req, String filter) {
+        return fixPath(req) + (filter.isEmpty() ? "" : "?filter=" + URLEncoder.encode(filter));
+    }
+
+    private static String fixPath(Request req) {
+        return req.pathInfo().replace("//", "/");
     }
 
 }
