@@ -2,28 +2,47 @@
 <%@ import app.model.* %>
 
 <%@ params(Application selectedApp, Version selectedVersion, Release release, Resource selectedResource, String path) %>
+
+<%-- TODO: Move Breadcrumb logic into base class --%>
 <ol class="breadcrumb">
     <li><a href="/">Home</a></li>
     <li><a href="/${selectedApp.getFileSystemName()}">${selectedApp.getName()}</a></li>
     <li><a href="/${selectedApp.getFileSystemName() + "/" + selectedVersion.getName()}">${selectedVersion.getName()}</a></li>
     <li><a href="/${selectedApp.getFileSystemName() + "/" + selectedVersion.getName() + "/" + release.getName() + "/"}">${release.getName()}</a></li>
     <% if (path.length() > 0) {
-       String pathBuilder = "";
-       for (String pathFragment : path.split("/")) {
-           pathBuilder = pathBuilder + pathFragment + "/"; %>
-           <li><a href="/${selectedApp.getFileSystemName() + "/" + selectedVersion.getName() + "/" + release.getName() + "/" + pathBuilder}">${pathFragment}</a></li>
-       <% }
-   } %>
+        String[] pathArray = path.split("/");
+        int i = 0;
+        boolean zipped = false;
+        String pathBuilder = "";
+        while(i < pathArray.length) {
+            String currentResource = pathArray[i];
+            if (zipped) {
+                i += 1;
+                while (i < pathArray.length && !(currentResource.endsWith(".zip") || currentResource.endsWith(".jar"))) {
+                    currentResource = currentResource + "/" + pathArray[i++];
+                }
+                i -= 1;
+            }
+            if (currentResource.endsWith(".zip") || currentResource.endsWith(".jar")) {
+                zipped = true;
+            }
+            pathBuilder = pathBuilder + currentResource + "/";
+            i += 1; %>
+            <li><a href="/${selectedApp.getFileSystemName() + "/" + selectedVersion.getName() + "/" + release.getName() + "/" + pathBuilder}">${currentResource}</a></li>
+        <%  }
+    } %>
 </ol>
 <hr/>
 
-<h2>Explore Release</h2>
+<h2>Explore Release<i id="explore-ind" class="fa fa-spinner " style="display: none;"></i></h2>
 
 <% if (selectedResource.isDirectory()) { %>
-<div class="list-group">
+<div class="list-group" id="explorer">
     <% for (Resource r: selectedResource.getResources()) { %>
-        <a href="/${selectedApp.getFileSystemName() + "/" + selectedVersion.getName() + "/" + release.getName() + "/" + path + "/" + r.getName() + "/"}" class="list-group-item">
-            ${r.getName()}
+        <a href="/${selectedApp.getFileSystemName() + "/" + selectedVersion.getName() + "/" + release.getName() + "/" + path + "/" + r.getName() + "/"}"
+           class="list-group-item"
+           onClick="document.getElementById("explore-ind").classList.remove("invisible-icon")>
+               ${r.getName()}
         <% if (r.isDirectory()) { %>
             <i class="fa fa-folder-open" aria-hidden="true"></i>
         <% } %>

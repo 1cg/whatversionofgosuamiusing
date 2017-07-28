@@ -60,8 +60,24 @@ public class Server {
             Release releaseByCode = versionByCode.getReleaseByName(release);
             Resource selectedResource = releaseByCode;
             if (path.length() > 0) {
-                for (String pathFragment : path.split("/")) {
-                    selectedResource = selectedResource.getResourceByName(pathFragment);
+                String[] pathArray = path.split("/");
+                int i = 0;
+                boolean zipped = false;
+                while(i < pathArray.length) {
+                    String currentResource = pathArray[i];
+                    if (zipped) {
+                        i += 1;
+                        while (i < pathArray.length && !(currentResource.endsWith(".zip") || currentResource.endsWith(".jar"))) {
+                            currentResource = currentResource + "/" + pathArray[i++];
+                        }
+                        i -= 1;
+                    }
+                    if (currentResource.endsWith(".zip") || currentResource.endsWith(".jar")) {
+                        zipped = true;
+
+                    }
+                    selectedResource = selectedResource.getResourceByName(currentResource);
+                    i += 1;
                 }
             }
             return Explore.render(appByCode, versionByCode, releaseByCode, selectedResource, path);
