@@ -63,7 +63,7 @@ public class Server {
                 String[] pathArray = path.split("/");
                 int i = 0;
                 boolean zipped = false;
-                while(i < pathArray.length) {
+                while (i < pathArray.length) {
                     String currentResource = pathArray[i];
                     if (zipped) {
                         i += 1;
@@ -80,7 +80,25 @@ public class Server {
                     i += 1;
                 }
             }
-            return Explore.render(appByCode, versionByCode, releaseByCode, selectedResource, path);
+            // filter
+            if ("resource-list".equals(req.queryParams("ic-target-id"))) {
+                return Explore.ResourceList.render(appByCode,
+                        versionByCode,
+                        releaseByCode,
+                        selectedResource,
+                        path,
+                        req.queryParamOrDefault("filter", ""));
+
+            } else {
+                // full request
+                return Explore.render(appByCode,
+                        versionByCode,
+                        releaseByCode,
+                        selectedResource,
+                        path,
+                        req.queryParamOrDefault("filter", ""));
+            }
+
         });
 
         //Main.main(args); // start up a jconsole TODO only in dev mode

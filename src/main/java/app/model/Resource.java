@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
 /**
@@ -75,6 +76,14 @@ public class Resource {
             findResources();
         }
         return resources;
+    }
+
+    public List<Resource> getResources(String filter) {
+        assert isDirectory;
+        if (resources == null) {
+            findResources();
+        }
+        return resources.stream().filter(resource -> resource.getName().contains(filter)).collect(Collectors.toList());
     }
 
     //if is a directory

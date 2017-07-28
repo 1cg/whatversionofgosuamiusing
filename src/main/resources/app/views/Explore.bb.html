@@ -1,7 +1,7 @@
 <%@ layout Layout %>
 <%@ import app.model.* %>
 
-<%@ params(Application selectedApp, Version selectedVersion, Release release, Resource selectedResource, String path) %>
+<%@ params(Application selectedApp, Version selectedVersion, Release release, Resource selectedResource, String path, String filter) %>
 
 <%-- TODO: Move Breadcrumb logic into base class --%>
 <ol class="breadcrumb">
@@ -36,49 +36,50 @@
 
 <h2>Explore Release<i id="explore-ind" class="fa fa-spinner " style="display: none;"></i></h2>
 
-<% if (selectedResource.isDirectory()) { %>
-<div class="list-group" id="explorer">
-    <% for (Resource r: selectedResource.getResources()) { %>
+
+<div class="row">
+    <div class="col-md-6">
+        <label for="version">Gosu Version Info</label>
+        <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" name="version" id="version" placeholder="Enter Gosu Versions">
+        <button type="submit" class="btn btn-primary" >Save</button>
+    </div>
+</div>
+
+<hr/>
+
+<div class="row">
+    <div class="col-md-12">
+        <h3>
+            Search Resources
+            <span id="indicator" style="display:none"> <i class="fa fa-spinner fa-spin"></i> Searching... </span>
+        </h3>
+
+        <input class="form-control" type="text" name="filter" placeholder="Search Resources"
+               ic-get-from='/${selectedApp.getFileSystemName() + "/" + selectedVersion.getName() + "/" + release.getName() + "/" + path + "/" }'
+               ic-trigger-on="keyup changed" ic-trigger-delay="500ms"
+               ic-target="#resource-list" ic-indicator="#indicator">
+    </div>
+</div>
+
+<hr/>
+
+<div id="resource-list">
+    <%@ section ResourceList(selectedApp, selectedVersion, release, selectedResource, path, filter) %>
+    <% if (selectedResource.isDirectory()) { %>
+    <div class="list-group" id="explorer">
+        <% for (Resource r: selectedResource.getResources(filter)) { %>
         <a href="/${selectedApp.getFileSystemName() + "/" + selectedVersion.getName() + "/" + release.getName() + "/" + path + "/" + r.getName() + "/"}"
-           class="list-group-item"
-           onClick="document.getElementById("explore-ind").classList.remove("invisible-icon")>
-               ${r.getName()}
+        class="list-group-item"
+        onClick="document.getElementById("explore-ind").classList.remove("invisible-icon")>
+        ${r.getName()}
         <% if (r.isDirectory()) { %>
-            <i class="fa fa-folder-open" aria-hidden="true"></i>
+        <i class="fa fa-folder-open" aria-hidden="true"></i>
         <% } %>
         </a>
-    <% } %>
-</div>
-<% } else { %>
+        <% } %>
+    </div>
+    <% } else { %>
     ${selectedResource.getContent()}
-<% } %>
-
-<hr/>
-
-<form class="form-inline">
-    <label class="sr-only" for="version">Gosu Version</label>
-    <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" name="version" id="version" placeholder="Enter Gosu Versions">
-    <button type="submit" class="btn btn-primary" >Save</button>
-</form>
-
-<hr/>
-
-<div>
-    <h3>App</h3>
-    ${selectedApp.getName()}
-</div>
-
-<div>
-    <h3>Version</h3>
-    ${selectedVersion.getName()}
-</div>
-
-<div>
-    <h3>Release</h3>
-    ${release.getName()}
-</div>
-
-<div>
-    <h3>Path</h3>
-    ${path}
+    <% } %>
+   <%@ end section %>
 </div>
