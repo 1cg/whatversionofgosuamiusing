@@ -29,7 +29,7 @@ public class AppTemplate extends BaseBBTemplate {
         return sb.toString();
     }
 
-    public String getBreadcrumb(Application selectedApp, Version selectedVersion, Release selectedRelease, String path) {
+    public String breadcrumb(Application selectedApp, Version selectedVersion, Release selectedRelease, String path) {
         StringBuilder sb = new StringBuilder("<ol class=\"breadcrumb\">\n" +
                 "    <li><a href=\"/\">Home</a></li>\n");
         sb.append("    <li><a href=\"").append(pathFor(selectedApp)).append("\" class=\"breadcrumb-item\">").append(selectedApp.getName()).append("</a></li>\n");

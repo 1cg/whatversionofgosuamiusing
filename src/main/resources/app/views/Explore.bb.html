@@ -4,16 +4,18 @@
 
 <%@ params(Application selectedApp, Version selectedVersion, Release release, Resource selectedResource, String path, String filter) %>
 
-${getBreadcrumb(selectedApp, selectedVersion, release, path)}
+${breadcrumb(selectedApp, selectedVersion, release, path)}
+
 <hr/>
 
-<h2>Explore Release<i id="explore-ind" class="fa fa-spinner " style="display: none;"></i></h2>
+<h2>Explore Release</h2>
 
 
 <div class="row">
     <div class="col-md-6">
         <label for="version">Gosu Version Info</label>
-        <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" name="version" id="version" placeholder="Enter Gosu Versions">
+        <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" name="version" id="version"
+               placeholder="Enter Gosu Versions">
         <button type="submit" class="btn btn-primary" >Save</button>
     </div>
 </div>
@@ -42,13 +44,11 @@ ${getBreadcrumb(selectedApp, selectedVersion, release, path)}
     <% if (selectedResource.isDirectory()) { %>
     <div class="list-group" id="explorer">
         <% for (Resource r: selectedResource.getResources(filter)) { %>
-        <a href="${pathFor(selectedApp, selectedVersion, release, r, path)}"
-        class="list-group-item"
-        onClick="document.getElementById("explore-ind").classList.remove("invisible-icon")>
-        ${r.getName()}
-        <% if (r.isDirectory()) { %>
-        <i class="fa fa-folder-open" aria-hidden="true"></i>
-        <% } %>
+        <a class="list-group-item" href="${pathFor(selectedApp, selectedVersion, release, r, path)}">
+          ${r.getName()}
+          <% if (r.isDirectory()) { %>
+            <i class="fa fa-folder-open" aria-hidden="true"></i>
+          <% } %>
         </a>
         <% } %>
     </div>
