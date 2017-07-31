@@ -50,7 +50,7 @@ public class UnzipUtility {
             if (!destFile.exists()) {
                 destFile.createNewFile();
             }
-            extractFile(zipEntryIn, filePath);
+            extractFile(zipEntryIn, filePath, resource);
             zipEntryIn.close();
             return  new File(filePath);
         }
@@ -112,4 +112,18 @@ public class UnzipUtility {
         }
         bos.close();
     }
+
+    private static void extractFile(InputStream zipIn, String filePath, Resource resource) throws IOException {
+        resource.setTotalBytes(zipIn.available());
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
+        byte[] bytesIn = new byte[BUFFER_SIZE];
+        int read = 0;
+        while ((read = zipIn.read(bytesIn)) != -1) {
+            resource.bytesMoreRead(read);
+            //System.out.println(resource.getPercentUnzipped());
+            bos.write(bytesIn, 0, read);
+        }
+        bos.close();
+    }
+
 }

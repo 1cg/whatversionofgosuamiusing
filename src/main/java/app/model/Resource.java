@@ -99,11 +99,20 @@ public class Resource {
     private int _percentUnzipped = 0; // <- Make this real
     private Integer totalBytes = null;
     private int bytesRead = 0;
+
+    public void setTotalBytes(int totalBytes){
+        this.totalBytes = totalBytes;
+    }
+
+    public void bytesMoreRead(int bytesMoreRead) {
+        bytesRead += bytesMoreRead;
+        _percentUnzipped = bytesRead * 100 / totalBytes;
+    }
+
     public boolean isUnzipping() {
         if (totalBytes == null) {
             return false;
         }
-        _percentUnzipped = bytesRead/totalBytes;
         return _percentUnzipped < 100;
     }
 
