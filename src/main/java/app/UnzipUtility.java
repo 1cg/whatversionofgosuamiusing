@@ -3,20 +3,13 @@ package app;
 
 /**The code in this file is derived from www.codejava.net*/
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
+import app.model.Resource;
+
+import java.io.*;
 import java.nio.file.*;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
@@ -44,6 +37,30 @@ public class UnzipUtility {
         }
     }
 
+    public static File unzipFileFromZip(String zipFilePath, Resource resource) throws IOException {
+        File destDir = new File(UNZIP_DESTINATION);
+        if (!destDir.exists()) {
+            destDir.mkdir();
+        }
+        try (ZipFile zipFile = new ZipFile(zipFilePath)) {
+            InputStream zipEntryIn = zipFile.getInputStream(resource.zipEntry);
+            String filePath = UNZIP_DESTINATION + File.separator + resource.getName();
+            File destFile = new File(filePath);
+            if (!destFile.exists()) {
+                String directParent = filePath.substring(0, filePath.lastIndexOf("/"));
+                File parent = new File(directParent);
+                if (!parent.exists() && !directParent.equals(filePath)) {
+                    parent.mkdir();
+                }
+                destFile.createNewFile();
+            }
+            Path p = Paths.get(filePath);
+            extractFile(zipEntryIn, filePath);
+            zipEntryIn.close();
+            return  new File(filePath);
+        }
+    }
+
     //fileName ex: Server.java
     public static File unzipFileFromZip(String zipFilePath, String fileName) throws IOException {
         File destDir = new File(UNZIP_DESTINATION);
@@ -55,9 +72,9 @@ public class UnzipUtility {
         String filePath = null;
         // iterates over entries in the zip file
         while (entry != null) {
-            String entrySimpleName = new File(entry.getName()).getName();
-            if (entrySimpleName.equals(fileName)) {
-                filePath = UNZIP_DESTINATION + File.separator + entrySimpleName;
+            String entryName = entry.getName();
+            if (entryName.equals(fileName)) {
+                filePath = UNZIP_DESTINATION + File.separator + entryName;
                 break;
             }
             zipIn.closeEntry();
@@ -65,6 +82,9 @@ public class UnzipUtility {
         }
         assert (filePath != null);
         extractFile(zipIn, filePath);
+
+//          extractFile(Paths.get(zipFilePath), fileName);
+
 //        Path zipPath = Paths.get((zipFilePath));
 //        Path endLoc = Paths.get(filePath);
 //        extractFile(zipPath, fileName, endLoc);
@@ -81,7 +101,14 @@ public class UnzipUtility {
         }
     }
 
-    private static void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
+    private static void extractFile(Path zipFile, String filePath) throws IOException {
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
+        try (FileSystem fileSystem = FileSystems.newFileSystem(zipFile, null)) {
+            Files.copy(zipFile, bos);
+        }
+    }
+
+    private static void extractFile(InputStream zipIn, String filePath) throws IOException {
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
         byte[] bytesIn = new byte[BUFFER_SIZE];
         int read = 0;

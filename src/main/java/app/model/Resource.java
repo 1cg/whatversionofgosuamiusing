@@ -1,7 +1,6 @@
 package app.model;
 
 import app.UnzipUtility;
-import javarepl.internal.totallylazy.io.Zip;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -26,12 +25,13 @@ public class Resource {
         }
     }
 
-    File self;
+    public File self;
     Resource parent;
     List<Resource> resources;
     boolean needsToBeExtracted;
     private boolean isDirectory;
     String name;
+    public ZipEntry zipEntry= null;
 
 
     public Resource(File self, Resource parent) {
@@ -55,6 +55,7 @@ public class Resource {
         assert(!zipEntry.isDirectory());
         this.self = new File(zipEntry.getName());
         this.name = zipEntry.getName();
+        this.zipEntry = zipEntry;
         this.parent = parent;
         this.isDirectory = (zipEntry.isDirectory() || self.getName().endsWith(".zip") || self.getName().endsWith(".jar"));
         needsToBeExtracted = true;
@@ -64,10 +65,11 @@ public class Resource {
         return isDirectory;
     }
 
-    //ex. Server.java
+    //ex. Server.java, bin/j.java
     public String getName() {
         return name;
     }
+
 
     //if is a directory
     public List<Resource> getResources() {
@@ -168,7 +170,7 @@ public class Resource {
             assert(self.exists());
             {
                 try {
-                    self = UnzipUtility.unzipFileFromZip(parent.self.getAbsolutePath(), self.getName());
+                    self = UnzipUtility.unzipFileFromZip(parent.self.getAbsolutePath(), this);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
