@@ -88,6 +88,23 @@ public class Resource {
         return resources.stream().filter(resource -> resource.getName().contains(filter)).collect(Collectors.toList());
     }
 
+    // TODO Harika: replace this with a real variable
+    //      derived from the zip entry size (bytes) and the number of bytes read so far
+    //
+    //      Use a java.lang.Thread to do the unzipping the the background and the web app will
+    //      recheck the progress every 700ms or so eventually re-rendering when the
+    //      item is fully unzipped
+    //
+    private int _percentUnzipped = 5; // <- Make this real
+    public boolean isUnzipping() {
+        _percentUnzipped += 10;
+        return _percentUnzipped < 100;
+    }
+
+    public int getPercentUnzipped() {
+        return _percentUnzipped;
+    }
+
     //if is a directory
     public Resource getResourceByName(String resourceName) {
         assert isDirectory;
