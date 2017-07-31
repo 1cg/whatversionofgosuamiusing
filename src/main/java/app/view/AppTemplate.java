@@ -1,21 +1,27 @@
 package app.view;
 
+import app.Server;
 import app.model.Application;
 import app.model.Release;
 import app.model.Resource;
 import app.model.Version;
 import bb.runtime.BaseBBTemplate;
+import bb.sparkjava.BBSparkTemplate;
 
 import java.util.List;
 import java.util.function.Function;
 
-public class AppTemplate extends BaseBBTemplate {
+public class AppTemplate extends BBSparkTemplate {
 
-    public <T> String listOptions(List<T> items, T selected) {
+    public String currentPath() {
+        return Server.fixPath(getRequest());
+    }
+
+    public <T> Object listOptions(List<T> items, T selected) {
         return listOptions(items, Object::toString, Object::toString, selected);
     }
 
-    public <T> String listOptions(List<T> items, Function<T, Object> toStr, Function<T, Object> toVal, T selected) {
+    public <T> Object listOptions(List<T> items, Function<T, Object> toStr, Function<T, Object> toVal, T selected) {
         StringBuilder sb = new StringBuilder();
         for (T item : items) {
             sb.append("<option value=\"")
@@ -26,10 +32,10 @@ public class AppTemplate extends BaseBBTemplate {
             }
             sb.append(">").append(toStr.apply(item)).append("</option>");
         }
-        return sb.toString();
+        return raw(sb.toString());
     }
 
-    public String breadcrumb(Application selectedApp, Version selectedVersion, Release selectedRelease, String path) {
+    public Object breadcrumb(Application selectedApp, Version selectedVersion, Release selectedRelease, String path) {
         StringBuilder sb = new StringBuilder("<ol class=\"breadcrumb\">\n" +
                 "    <li><a href=\"/\">Home</a></li>\n");
         sb.append("    <li><a href=\"").append(pathFor(selectedApp)).append("\" class=\"breadcrumb-item\">").append(selectedApp.getName()).append("</a></li>\n");
@@ -68,7 +74,7 @@ public class AppTemplate extends BaseBBTemplate {
             }
         }
         sb.append("\n</ol>\n");
-        return sb.toString();
+        return raw(sb.toString());
     }
 
     public String pathFor(Application selectedApp) {

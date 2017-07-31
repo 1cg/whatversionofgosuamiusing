@@ -95,7 +95,7 @@ public class Server {
         return fixPath(req) + (filter.isEmpty() ? "" : "?filter=" + URLEncoder.encode(filter));
     }
 
-    private static String fixPath(Request req) {
+    public static String fixPath(Request req) {
         return req.pathInfo().replace("//", "/");
     }
 

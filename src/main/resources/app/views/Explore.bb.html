@@ -22,6 +22,7 @@ ${breadcrumb(selectedApp, selectedVersion, release, path)}
 
 <hr/>
 
+<% if (selectedResource.isDirectory()) { %>
 <div class="row">
     <div class="col-md-12">
         <h3>
@@ -38,10 +39,19 @@ ${breadcrumb(selectedApp, selectedVersion, release, path)}
 </div>
 
 <hr/>
+<% } %>
 
 <div id="resource-list">
     <%@ section ResourceList(selectedApp, selectedVersion, release, selectedResource, path, filter) %>
-    <% if (selectedResource.isDirectory()) { %>
+    <% if (selectedResource.isUnzipping()) { %>
+      <h3>Extracting ${selectedResource.getName()}</h3>
+        <div class="progress" ic-trigger-on="load" ic-get-from="${currentPath()}" ic-target="#resource-list" ic-trigger-delay="700ms">
+            <div class="progress-bar" role="progressbar" aria-valuenow="${selectedResource.getPercentUnzipped()}"
+                 aria-valuemin="0" aria-valuemax="100" style="width: ${selectedResource.getPercentUnzipped()}%;">
+                <span class="sr-only">${selectedResource.getPercentUnzipped()}% Complete</span>
+            </div>
+        </div>
+    <% } else if (selectedResource.isDirectory()) { %>
     <div class="list-group" id="explorer">
         <% for (Resource r: selectedResource.getResources(filter)) { %>
         <a class="list-group-item" href="${pathFor(selectedApp, selectedVersion, release, r, path)}">
@@ -53,7 +63,8 @@ ${breadcrumb(selectedApp, selectedVersion, release, path)}
         <% } %>
     </div>
     <% } else { %>
-    ${selectedResource.getContent()}
+    <h4>File Contents:</h4>
+    <pre>${selectedResource.getContent()}</pre>
     <% } %>
    <%@ end section %>
 </div>
