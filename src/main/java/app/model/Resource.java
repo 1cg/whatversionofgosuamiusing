@@ -90,14 +90,20 @@ public class Resource {
 
     // TODO Harika: replace this with a real variable
     //      derived from the zip entry size (bytes) and the number of bytes read so far
+    // Use a java.lang.Thread to do the unzipping the the background
     //
-    //      Use a java.lang.Thread to do the unzipping the the background and the web app will
+    // and the web app will
     //      recheck the progress every 700ms or so eventually re-rendering when the
     //      item is fully unzipped
     //
-    private int _percentUnzipped = 5; // <- Make this real
+    private int _percentUnzipped = 0; // <- Make this real
+    private Integer totalBytes = null;
+    private int bytesRead = 0;
     public boolean isUnzipping() {
-        _percentUnzipped += 10;
+        if (totalBytes == null) {
+            return false;
+        }
+        _percentUnzipped = bytesRead/totalBytes;
         return _percentUnzipped < 100;
     }
 
@@ -185,13 +191,13 @@ public class Resource {
     private void ensureExtracted() {
         if (needsToBeExtracted) {
             assert(self.exists());
-            {
+
                 try {
                     self = UnzipUtility.unzipFileFromZip(parent.self.getAbsolutePath(), this);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-            }
+
             assert(self.exists());
         }
         needsToBeExtracted = false;

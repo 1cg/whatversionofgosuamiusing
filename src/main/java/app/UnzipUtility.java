@@ -45,16 +45,11 @@ public class UnzipUtility {
         try (ZipFile zipFile = new ZipFile(zipFilePath)) {
             InputStream zipEntryIn = zipFile.getInputStream(resource.zipEntry);
             String filePath = UNZIP_DESTINATION + File.separator + resource.getName();
+            filePath = filePath.replace("/", ".");
             File destFile = new File(filePath);
             if (!destFile.exists()) {
-                String directParent = filePath.substring(0, filePath.lastIndexOf("/"));
-                File parent = new File(directParent);
-                if (!parent.exists() && !directParent.equals(filePath)) {
-                    parent.mkdir();
-                }
                 destFile.createNewFile();
             }
-            Path p = Paths.get(filePath);
             extractFile(zipEntryIn, filePath);
             zipEntryIn.close();
             return  new File(filePath);
