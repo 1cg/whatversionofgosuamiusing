@@ -49,10 +49,14 @@ public class UnzipUtility {
             File destFile = new File(filePath);
             if (!destFile.exists()) {
                 destFile.createNewFile();
+
             }
             extractFile(zipEntryIn, filePath, resource);
             zipEntryIn.close();
-            return  new File(filePath);
+            return destFile;
+        } catch (Exception e) {
+            int i = 0;
+            return null;
         }
     }
 

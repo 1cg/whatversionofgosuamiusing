@@ -201,11 +201,17 @@ public class Resource {
         if (needsToBeExtracted) {
             assert(self.exists());
 
-                try {
-                    self = UnzipUtility.unzipFileFromZip(parent.self.getAbsolutePath(), this);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+            Thread thread = new Thread(){
+                public void run(){
+                    try {
+                        self = UnzipUtility.unzipFileFromZip(parent.self.getAbsolutePath(), Resource.this);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
+            };
+
+            thread.start();
 
             assert(self.exists());
         }
