@@ -8,6 +8,7 @@ import app.model.Resource;
 import java.io.*;
 import java.nio.file.*;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -49,8 +50,8 @@ public class UnzipUtility {
             File destFile = new File(filePath);
             if (!destFile.exists()) {
                 destFile.createNewFile();
-
             }
+            resource.setTotalBytes(resource.zipEntry.getSize());
             extractFile(zipEntryIn, filePath, resource);
             zipEntryIn.close();
             return destFile;
@@ -118,7 +119,6 @@ public class UnzipUtility {
     }
 
     private static void extractFile(InputStream zipIn, String filePath, Resource resource) throws IOException {
-        resource.setTotalBytes(zipIn.available());
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
         byte[] bytesIn = new byte[BUFFER_SIZE];
         int read = 0;

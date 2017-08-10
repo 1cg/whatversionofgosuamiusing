@@ -25,40 +25,31 @@ public class Resource {
         }
     }
 
-    public File self;
+    public File backingFile;
     Resource parent;
     List<Resource> resources;
-    boolean needsToBeExtracted;
     private boolean isDirectory;
     String name;
     public ZipEntry zipEntry= null;
-
+    boolean _unzipping = false;
+    private int _percentUnzipped = 0;
+    private long totalBytes = -1;
+    private long bytesRead = 0;
 
     public Resource(File self, Resource parent) {
-        this.self = self;
+        this.backingFile = self;
         this.name = self.getName();
         this.parent = parent;
         this.isDirectory = (self.isDirectory() || self.getName().endsWith(".zip") || self.getName().endsWith(".jar"));
-        if (parent == null) {
-            //release
-            needsToBeExtracted = false;
-        } else {
-            if (parent.self.getName().endsWith(".zip") || parent.self.getName().endsWith(".jar")) {
-                needsToBeExtracted = true;
-            } else {
-                needsToBeExtracted = false;
-            }
-        }
     }
 
     public Resource(ZipEntry zipEntry, Resource parent) {
         assert(!zipEntry.isDirectory());
-        this.self = new File(zipEntry.getName());
+        this.backingFile = new File(zipEntry.getName());
         this.name = zipEntry.getName();
         this.zipEntry = zipEntry;
         this.parent = parent;
-        this.isDirectory = (zipEntry.isDirectory() || self.getName().endsWith(".zip") || self.getName().endsWith(".jar"));
-        needsToBeExtracted = true;
+        this.isDirectory = (zipEntry.isDirectory() || backingFile.getName().endsWith(".zip") || backingFile.getName().endsWith(".jar"));
     }
 
     public boolean isDirectory() {
@@ -90,30 +81,25 @@ public class Resource {
 
     // TODO Harika: replace this with a real variable
     //      derived from the zip entry size (bytes) and the number of bytes read so far
-    // Use a java.lang.Thread to do the unzipping the the background
+    // Use a java.lang.Thread to do the _unzipping the the background
     //
     // and the web app will
     //      recheck the progress every 700ms or so eventually re-rendering when the
     //      item is fully unzipped
     //
-    private int _percentUnzipped = 0; // <- Make this real
-    private Integer totalBytes = null;
-    private int bytesRead = 0;
 
-    public void setTotalBytes(int totalBytes){
+
+    public void setTotalBytes(long totalBytes){
         this.totalBytes = totalBytes;
     }
 
     public void bytesMoreRead(int bytesMoreRead) {
         bytesRead += bytesMoreRead;
-        _percentUnzipped = bytesRead * 100 / totalBytes;
+        _percentUnzipped = (int) (bytesRead * 100 / totalBytes);
     }
 
     public boolean isUnzipping() {
-        if (totalBytes == null) {
-            return false;
-        }
-        return _percentUnzipped < 100;
+        return _unzipping;
     }
 
     public int getPercentUnzipped() {
@@ -164,9 +150,9 @@ public class Resource {
     public String getContent() {
         ensureExtracted();
         assert(!isDirectory);
-        assert(self.canRead());
+        assert(backingFile.canRead());
         try {
-            return new String(Files.readAllBytes(Paths.get(self.getAbsolutePath())));
+            return new String(Files.readAllBytes(Paths.get(backingFile.getAbsolutePath())));
         } catch (IOException e){
             throw new RuntimeException(e);
         }
@@ -176,9 +162,9 @@ public class Resource {
         ensureExtracted();
         resources = new ArrayList<>();
 
-        if (self.getName().endsWith(".zip") || self.getName().endsWith(".jar")) {
+        if (backingFile.getName().endsWith(".zip") || backingFile.getName().endsWith(".jar")) {
             try {
-                List<ZipEntry> zipEntries = UnzipUtility.getEntriesFromZip(self.getAbsolutePath());
+                List<ZipEntry> zipEntries = UnzipUtility.getEntriesFromZip(backingFile.getAbsolutePath());
                 for (ZipEntry zipEntry : zipEntries) {
                     if (!zipEntry.isDirectory()) {
                         resources.add(new Resource(zipEntry, this));
@@ -188,8 +174,8 @@ public class Resource {
                 throw new RuntimeException(e);
             }
         } else {
-            assert(self.isDirectory());
-            List<File> resourceFiles = Arrays.asList(self.listFiles());
+            assert(backingFile.isDirectory());
+            List<File> resourceFiles = Arrays.asList(backingFile.listFiles());
             for (File resourceFile : resourceFiles) {
                 resources.add(new Resource(resourceFile, this));
             }
@@ -197,24 +183,27 @@ public class Resource {
     }
 
     //if your parent is a zip, extract yourself
-    private void ensureExtracted() {
-        if (needsToBeExtracted) {
-            assert(self.exists());
-
-            Thread thread = new Thread(){
-                public void run(){
-                    try {
-                        self = UnzipUtility.unzipFileFromZip(parent.self.getAbsolutePath(), Resource.this);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+    public void ensureExtracted() {
+        if (parent != null) {
+            if (parent.backingFile.getName().endsWith(".zip") || parent.backingFile.getName().endsWith(".jar")) {
+                _unzipping = true;
+                assert(backingFile.exists());
+                Thread thread = new Thread(){
+                    public void run(){
+                        try {
+                            backingFile = UnzipUtility.unzipFileFromZip(parent.backingFile.getAbsolutePath(), Resource.this);
+                            _unzipping = false;
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
-                }
-            };
+                };
 
-            thread.start();
+                thread.start();
 
-            assert(self.exists());
+                assert(backingFile.exists());
+            }
+
         }
-        needsToBeExtracted = false;
     }
 }
