@@ -65,6 +65,8 @@ public class Server {
             Release releaseByCode = versionByCode.getReleaseByName(release);
             Resource selectedResource = releaseByCode.getResourceByPath(path);
 
+            selectedResource.ensureExtracted();
+
             // filter
             if ("resource-list".equals(req.queryParams("ic-target-id"))) {
                 resp.header("X-IC-PushURL", filterUrl(req, filter));
