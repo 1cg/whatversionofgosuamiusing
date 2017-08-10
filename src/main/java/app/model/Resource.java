@@ -186,24 +186,21 @@ public class Resource {
     public void ensureExtracted() {
         if (parent != null) {
             if (parent.backingFile.getName().endsWith(".zip") || parent.backingFile.getName().endsWith(".jar")) {
-                _unzipping = true;
-                assert(backingFile.exists());
-                Thread thread = new Thread(){
-                    public void run(){
-                        try {
-                            backingFile = UnzipUtility.unzipFileFromZip(parent.backingFile.getAbsolutePath(), Resource.this);
-                            _unzipping = false;
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
+                if (!backingFile.exists() && !_unzipping) {
+                    _unzipping = true;
+                    Thread thread = new Thread() {
+                        public void run() {
+                            try {
+                                backingFile = UnzipUtility.unzipFileFromZip(parent.backingFile.getAbsolutePath(), Resource.this);
+                                _unzipping = false;
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
                         }
-                    }
-                };
-
-                thread.start();
-
-                assert(backingFile.exists());
+                    };
+                    thread.start();
+                }
             }
-
         }
     }
 }
