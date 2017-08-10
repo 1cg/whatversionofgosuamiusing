@@ -1,5 +1,10 @@
 package app.model;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
+
 import java.io.File;
 
 /**
@@ -7,17 +12,37 @@ import java.io.File;
  */
 public class Release extends Resource {
 
-    public Release(File self) {
+    private final Version _version;
+    String _gosuVersionInfo = null;
+
+    public Release(Version version, File self) {
         super(self, null);
+        _version = version;
     }
 
-    String gosuVersion = null;
-
-    public void addGosuVersion(String version) {
-        if (gosuVersion == null) {
-            gosuVersion = version;
-        } else {
-            //@TODO: send some sort of feedback/double check
+    public String getGosuVersionInfo() {
+        if (_gosuVersionInfo == null) {
+            MongoDatabase db = Mongo.getClient().getDatabase("gosu_release_info");
+            MongoCollection<Document> collection = db.getCollection("releases_info");
+            Document doc = collection.find(new Document("_id", getMongoID())).first();
+            if (doc != null) {
+                _gosuVersionInfo = doc.getString("version_info");
+            } else {
+                _gosuVersionInfo = "No Info";
+            }
         }
+        return _gosuVersionInfo;
+    }
+
+    public void setGosuVersionInfo(String version) {
+        MongoDatabase db = Mongo.getClient().getDatabase("gosu_release_info");
+        MongoCollection<Document> collection = db.getCollection("releases_info");
+        Document query = new Document("_id", getMongoID()).append("version_info", version);
+        collection.insertOne(query);
+        _gosuVersionInfo = version;
+    }
+
+    public Object getMongoID() {
+        return _version.getApplication().getFileSystemName() + "-" + _version.getName() + "-" + this.getName();
     }
 }
