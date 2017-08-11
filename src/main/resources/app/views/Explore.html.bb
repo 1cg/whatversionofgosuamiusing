@@ -26,7 +26,7 @@ ${breadcrumb(selectedApp, selectedVersion, release, path)}
                 <button type="submit" class="btn btn-primary" >Save</button>
             </form>
             <% if (newVersionNumber != null) { %>
-                <div class="alert alert-success" role="alert">
+                <div class="alert alert-success" role="alert" ic-remove-after='2s'>
                   Gosu Version for ${nameFor(selectedApp, release)}
                   successfully updated to ${newVersionNumber}
                 </div>
