@@ -36,7 +36,7 @@ public class Version {
 
         File[] releasesFiles = RELEASE.listFiles(new FilterFilesStartWNumber());
         for (File releaseFile : releasesFiles) {
-            releases.add(new Release(releaseFile));
+            releases.add(new Release(this, releaseFile));
         }
     }
 
@@ -65,5 +65,9 @@ public class Version {
             }
         }
         return null;
+    }
+
+    public Application getApplication() {
+        return parent;
     }
 }

@@ -48,12 +48,12 @@
                 </tr>
                 </thead>
                 <tbody>
-                <% for(String release: selectedApp.getReleasesNames(selectedVersion)) { %>
+                <% for(Release release: selectedApp.getVersionByName(selectedVersion).getReleases()) { %>
                 <tr>
-                    <td>${release}</td>
-                    <td>Unknown</td>
+                    <td>${release.getName()}</td>
+                    <td>${release.getGosuVersionInfo()}</td>
                     <td>
-                        <a href='/${selectedApp.getFileSystemName() + "/" + selectedVersion + "/" + release + "/"}'>Explore >>></a>
+                        <a href='/${selectedApp.getFileSystemName() + "/" + selectedVersion + "/" + release.getName() + "/"}'>Explore >>></a>
                     </td>
                 </tr>
                 <% } %>
