@@ -101,6 +101,10 @@ public class AppTemplate extends BBSparkTemplate {
         }
     }
 
+    public String nameFor(Application selectedApp, Release selectedRelease) {
+        return selectedApp.getName() +  " " + selectedRelease.getName();
+    }
+
 
 
 }

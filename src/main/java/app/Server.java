@@ -35,6 +35,7 @@ public class Server {
             }
         });
 
+
         get("/:app", (req, resp) -> {
             if ("releases".equals(req.queryParams("ic-target-id"))) {
                 String app = req.queryParams("app");
@@ -88,6 +89,20 @@ public class Server {
                         filter);
             }
 
+        });
+
+        post("/:app/:version/:release/*", (req, resp) -> {
+            String app = req.params("app");
+            String version = req.params("version");
+            String release = req.params("release");
+
+            Application appByCode = Application.getAppByFileName(app);
+            Version versionByCode = appByCode.getVersionByName(version);
+            Release releaseByCode = versionByCode.getReleaseByName(release);
+
+            String gosuVersionNumber = req.queryParams("version");
+            releaseByCode.setGosuVersionInfo(gosuVersionNumber);
+            return Explore.exploreForm.render(appByCode, versionByCode, releaseByCode, gosuVersionNumber);
         });
 
         //Main.main(args); // start up a jconsole TODO only in dev mode

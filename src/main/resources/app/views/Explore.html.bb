@@ -10,13 +10,23 @@ ${breadcrumb(selectedApp, selectedVersion, release, path)}
 
 <h2>Explore Release</h2>
 
-
+<% String newVersionNumber = null; %>
 <div class="row">
     <div class="col-md-6">
-        <label for="version">Gosu Version Info</label>
-        <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" name="version" id="version"
-               placeholder="Enter Gosu Versions">
-        <button type="submit" class="btn btn-primary" >Save</button>
+        <%@ section exploreForm(selectedApp, selectedVersion, release, newVersionNumber) %>
+            <form ic-post-to="${pathFor(selectedApp, selectedVersion, release)}">
+                <label for="version">Gosu Version Info</label>
+                <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" name="version" id="version"
+                       placeholder="Enter Gosu Versions">
+                <button type="submit" class="btn btn-primary" >Save</button>
+            </form>
+            <% if (newVersionNumber != null) { %>
+                <div class="alert alert-success" role="alert">
+                  Gosu Version for ${nameFor(selectedApp, release)}
+                  successfully updated to ${newVersionNumber}
+                </div>
+            <% } %>
+        <%@ end section %>
     </div>
 </div>
 
