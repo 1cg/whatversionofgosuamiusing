@@ -17,7 +17,12 @@ ${breadcrumb(selectedApp, selectedVersion, release, path)}
             <form ic-post-to="${pathFor(selectedApp, selectedVersion, release)}">
                 <label for="version">Gosu Version Info</label>
                 <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" name="version" id="version"
-                       placeholder="Enter Gosu Versions">
+                       <% if (release.getGosuVersionInfo().equals("No Info")) { %>
+                       placeholder="Enter Gosu Versions"
+                       <% } else { %>
+                       placeholder="Update Gosu Version from <%= release.getGosuVersionInfo() %>"
+                       <% } %>
+                >
                 <button type="submit" class="btn btn-primary" >Save</button>
             </form>
             <% if (newVersionNumber != null) { %>
