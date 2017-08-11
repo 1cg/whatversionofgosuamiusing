@@ -3,6 +3,7 @@ package app.model;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.UpdateOptions;
 import org.bson.Document;
 
 import java.io.File;
@@ -37,8 +38,16 @@ public class Release extends Resource {
     public void setGosuVersionInfo(String version) {
         MongoDatabase db = Mongo.getClient().getDatabase("gosu_release_info");
         MongoCollection<Document> collection = db.getCollection("releases_info");
+        Document doc = collection.find(new Document("_id", getMongoID())).first();
         Document query = new Document("_id", getMongoID()).append("version_info", version);
-        collection.insertOne(query);
+        if (doc != null) {
+            collection.replaceOne(
+                    new Document("_id", getMongoID()),
+                    query,
+                    new UpdateOptions().upsert( true ));
+        } else {
+            collection.insertOne(query);
+        }
         _gosuVersionInfo = version;
     }
 
