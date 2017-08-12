@@ -46,9 +46,13 @@ public class UnzipUtility {
         try (ZipFile zipFile = new ZipFile(zipFilePath)) {
             InputStream zipEntryIn = zipFile.getInputStream(resource.zipEntry);
             String filePath = UNZIP_DESTINATION + File.separator + resource.getName();
-            filePath = filePath.replace("/", ".");
+            filePath = filePath.replace("\\", File.separator).replace("/", File.separator);
             File destFile = new File(filePath);
             if (!destFile.exists()) {
+                File parentFile = new File(filePath.substring(0, filePath.lastIndexOf(File.separator)));
+                if (!parentFile.exists()) {
+                    parentFile.mkdirs();
+                }
                 destFile.createNewFile();
             }
             resource.setTotalBytes(resource.zipEntry.getSize());
