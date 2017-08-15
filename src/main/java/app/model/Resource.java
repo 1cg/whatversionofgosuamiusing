@@ -127,6 +127,7 @@ public class Resource {
             int i = 0;
             boolean zipped = false;
             while (i < pathArray.length) {
+                System.out.print(130);System.out.println(selectedResource.backingFile);
                 String currentResource = pathArray[i];
                 if (zipped) {
                     i += 1;
@@ -137,7 +138,6 @@ public class Resource {
                 }
                 if (currentResource.endsWith(".zip") || currentResource.endsWith(".jar")) {
                     zipped = true;
-
                 }
                 selectedResource = selectedResource.getResourceByName(currentResource);
                 i += 1;
@@ -191,14 +191,21 @@ public class Resource {
                     Thread thread = new Thread() {
                         public void run() {
                             try {
+                                System.out.print(193);System.out.print(Resource.this.backingFile);
                                 backingFile = UnzipUtility.unzipFileFromZip(parent.backingFile.getAbsolutePath(), Resource.this);
                                 _unzipping = false;
+                                System.out.print(196);System.out.print(Resource.this.backingFile);
+                                return;
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
                         }
                     };
+                    System.out.print(203);System.out.print(backingFile);
                     thread.start();
+                    System.out.print(205);System.out.print(backingFile);
+                    int i = 2;
+                    int t = i + 1;
                 }
             }
         }
